@@ -136,14 +136,14 @@ cdef class ntl_mat_GF2E():
             self.c = <ntl_GF2EContext_class>ntl_GF2EContext(modulus)
             self.c.restore_c()
 
-    cdef ntl_GF2E _new_element(self) noexcept:
+    cdef ntl_GF2E _new_element(self):
         cdef ntl_GF2E r
         self.c.restore_c()
         r = ntl_GF2E.__new__(ntl_GF2E)
         r.c = self.c
         return r
 
-    cdef ntl_mat_GF2E _new(self) noexcept:
+    cdef ntl_mat_GF2E _new(self):
         cdef ntl_mat_GF2E r
         self.c.restore_c()
         r = ntl_mat_GF2E.__new__(ntl_mat_GF2E)
@@ -518,7 +518,7 @@ cdef class ntl_mat_GF2E():
 
         INPUT:
 
-        - ``k`` - optional GF(2**deg)
+        - ``k`` -- optional GF(2**deg)
 
         OUTPUT:
             Matrix over k
@@ -669,9 +669,9 @@ cdef class ntl_mat_GF2E():
 
         INPUT:
 
-        -  ``density`` - float; proportion (roughly) to be considered for
+        -  ``density`` -- float; proportion (roughly) to be considered for
            changes
-        -  ``nonzero`` - Bool (default: ``False``); whether the new entries
+        -  ``nonzero`` -- Bool (default: ``False``); whether the new entries
            are forced to be non-zero
 
         EXAMPLES::

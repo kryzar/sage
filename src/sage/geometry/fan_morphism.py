@@ -1,4 +1,4 @@
-# sage.doctest: optional - sage.graphs, sage.combinat
+# sage.doctest: needs sage.combinat sage.graphs
 r"""
 Morphisms between toric lattices compatible with fans
 
@@ -85,11 +85,8 @@ from sage.matrix.constructor import matrix
 from sage.matrix.special import identity_matrix
 from sage.structure.element import is_Matrix
 from sage.misc.cachefunc import cached_method
-from sage.misc.latex import latex
-from sage.misc.misc import walltime
 from sage.misc.misc_c import prod
-from sage.modules.free_module_morphism import (FreeModuleMorphism,
-                                               is_FreeModuleMorphism)
+from sage.modules.free_module_morphism import FreeModuleMorphism
 from sage.rings.infinity import Infinity
 from sage.rings.integer_ring import ZZ
 from sage.rings.infinity import is_Infinite
@@ -276,7 +273,7 @@ class FanMorphism(FreeModuleMorphism):
             codomain, codomain_fan = codomain.lattice(), codomain
         else:
             codomain_fan = None
-        if is_FreeModuleMorphism(morphism):
+        if isinstance(morphism, FreeModuleMorphism):
             parent = morphism.parent()
             A = morphism.matrix()
         elif is_Matrix(morphism):
@@ -506,6 +503,7 @@ class FanMorphism(FreeModuleMorphism):
             0 & 1
             \end{array}\right) : \Sigma^{2} \to \Sigma^{2}
         """
+        from sage.misc.latex import latex
         return (r"%s : %s \to %s" % (latex(self.matrix()),
                         latex(self.domain_fan()), latex(self.codomain_fan())))
 
@@ -650,7 +648,7 @@ class FanMorphism(FreeModuleMorphism):
             into the support of
             Rational polyhedral fan in 2-d lattice N!
 
-        We check that :trac:`10943` is fixed::
+        We check that :issue:`10943` is fixed::
 
             sage: Sigma = Fan(rays=[(1,1,0), (1,-1,0)], cones=[(0,1)])
             sage: Sigma_prime = FaceFan(lattice_polytope.cross_polytope(3))
@@ -1304,7 +1302,7 @@ class FanMorphism(FreeModuleMorphism):
 
         TESTS:
 
-        We check that reviewer's example on :trac:`11200` works as expected::
+        We check that reviewer's example on :issue:`11200` works as expected::
 
             sage: P1 = toric_varieties.P1()
             sage: A1 = toric_varieties.A1()
@@ -1452,7 +1450,7 @@ class FanMorphism(FreeModuleMorphism):
 
         TESTS:
 
-        We check that reviewer's example on :trac:`11200` works as expected::
+        We check that reviewer's example on :issue:`11200` works as expected::
 
             sage: P1 = toric_varieties.P1()
             sage: A1 = toric_varieties.A1()
@@ -1568,7 +1566,7 @@ class FanMorphism(FreeModuleMorphism):
 
         TESTS:
 
-        We check that reviewer's example from :trac:`9972` is handled correctly::
+        We check that reviewer's example from :issue:`9972` is handled correctly::
 
             sage: # needs palp
             sage: N1 = ToricLattice(1)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Boolean functions
 
@@ -51,7 +50,7 @@ except ImportError:
 # walsh_hadamard transform, reed_muller transform, and a lot
 # more, see 'Matters computational' available on www.jjj.de.
 
-cdef walsh_hadamard(long *f, int ldn) noexcept:
+cdef walsh_hadamard(long *f, int ldn):
     r"""
     The Walsh Hadamard transform is an orthogonal transform equivalent
     to a multidimensional discrete Fourier transform of size 2x2x...x2.
@@ -109,7 +108,7 @@ cdef long yellow_code(unsigned long a) noexcept:
         m ^= (m<<s)
     return r
 
-cdef reed_muller(mp_limb_t* f, int ldn) noexcept:
+cdef reed_muller(mp_limb_t* f, int ldn):
     r"""
     The Reed Muller transform (also known as binary Möbius transform)
     is an orthogonal transform. For a function `f` defined by
@@ -233,12 +232,12 @@ cdef class BooleanFunction(SageObject):
         Construct a Boolean Function.
         The input ``x`` can be either:
 
-        - an integer - the result is the zero function with ``x`` variables;
-        - a list - it is expected to be the truth table of the
+        - an integer -- the result is the zero function with ``x`` variables;
+        - a list -- it is expected to be the truth table of the
           result. Therefore it must be of length a power of 2, and its
           elements are interpreted as Booleans;
-        - a Boolean polynomial - the result is the corresponding Boolean function;
-        - a polynomial P over an extension of GF(2) - the result is
+        - a Boolean polynomial -- the result is the corresponding Boolean function;
+        - a polynomial P over an extension of GF(2) -- the result is
           the Boolean function with truth table ``( Tr(P(x)) for x in
           GF(2^k) )``
 
@@ -695,7 +694,7 @@ cdef class BooleanFunction(SageObject):
         """
         return self._walsh_hadamard_transform
 
-    cpdef tuple walsh_hadamard_transform(self) noexcept:
+    cpdef tuple walsh_hadamard_transform(self):
         r"""
         Compute the Walsh Hadamard transform `W` of the function `f`.
 

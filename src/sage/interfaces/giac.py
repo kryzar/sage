@@ -214,7 +214,7 @@ For more details, see the documentation for ``._sage_()``.
 
 TESTS:
 
-Test that conversion of symbolic functions with latex names works (:trac:`31047`)::
+Test that conversion of symbolic functions with latex names works (:issue:`31047`)::
 
     sage: var('phi')
     phi
@@ -1107,12 +1107,12 @@ class GiacElement(ExpectElement):
 
         TESTS:
 
-        Check conversion of Booleans (:trac:`28705`)::
+        Check conversion of Booleans (:issue:`28705`)::
 
             sage: giac('true')._sage_(), giac('false')._sage_()
             (True, False)
 
-        Check that variables and constants are not mixed up (:trac:`30133`)::
+        Check that variables and constants are not mixed up (:issue:`30133`)::
 
             sage: ee, ii, pp = SR.var('e,i,pi')
             sage: giac(ee * ii * pp).sage().variables()
@@ -1151,11 +1151,11 @@ class GiacElement(ExpectElement):
         INPUT:
 
 
-        -  ``var`` - variable
+        -  ``var`` -- variable
 
-        -  ``min`` - default: None
+        -  ``min`` -- default: None
 
-        -  ``max`` - default: None
+        -  ``max`` -- default: None
 
 
         This returns the definite integral if xmin is not None, otherwise
@@ -1190,11 +1190,11 @@ class GiacElement(ExpectElement):
 
         INPUT:
 
-        -  ``var`` - variable
+        -  ``var`` -- variable
 
-        -  ``min`` - default: None
+        -  ``min`` -- default: None
 
-        -  ``max`` - default: None
+        -  ``max`` -- default: None
 
         This returns the definite integral if xmin is not None, otherwise
         an indefinite integral.

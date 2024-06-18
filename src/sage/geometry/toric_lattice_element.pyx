@@ -96,7 +96,6 @@ Or you can create a homomorphism from one lattice to any other::
 
 from sage.libs.gmp.mpz cimport *
 
-from sage.geometry.toric_plotter import ToricPlotter
 from sage.modules.vector_integer_dense cimport Vector_integer_dense
 from sage.structure.coerce_exceptions import CoercionException
 from sage.structure.element cimport Vector
@@ -223,13 +222,13 @@ cdef class ToricLatticeElement(Vector_integer_dense):
         """
         return Vector_integer_dense.__hash__(self)
 
-    cpdef _act_on_(self, other, bint self_on_left) noexcept:
+    cpdef _act_on_(self, other, bint self_on_left):
         """
         Act on ``other``.
 
         INPUT:
 
-        - ``other`` - :class:`ToricLatticeElement`.
+        - ``other`` -- :class:`ToricLatticeElement`.
 
         OUTPUT:
 
@@ -298,7 +297,7 @@ cdef class ToricLatticeElement(Vector_integer_dense):
     # We need to override this function to prohibit default behaviour.
     # It seems to be called when right is in the same lattice as self, which
     # is wrong from our point of view.
-    cpdef _dot_product_(self, Vector right) noexcept:
+    cpdef _dot_product_(self, Vector right):
         """
         Raise a :class:`TypeError` exception.
 
@@ -307,7 +306,7 @@ cdef class ToricLatticeElement(Vector_integer_dense):
 
         INPUT:
 
-        - ``right`` - vector.
+        - ``right`` -- vector.
 
         OUTPUT:
 
@@ -397,6 +396,7 @@ cdef class ToricLatticeElement(Vector_integer_dense):
             sage: n.plot()                                                              # needs sage.plot
             Graphics3d Object
         """
+        from sage.geometry.toric_plotter import ToricPlotter
         tp = ToricPlotter(options, self.parent().degree())
         tp.adjust_options()
         return tp.plot_points([self])

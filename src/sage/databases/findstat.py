@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 r"""
 FindStat - the search engine for combinatorial statistics and maps
 
@@ -841,7 +840,7 @@ def _generating_functions_from_dict(gfs, style):
     if style == "polynomial":
         from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
         from sage.rings.integer_ring import ZZ
-        P = PolynomialRing(ZZ, "q")
+        P = PolynomialRing(ZZ, "q", sparse=True)
         q = P.gen()
         return {level: sum(coefficient * q**exponent
                            for exponent, coefficient in gen_dict.items())
@@ -2051,7 +2050,7 @@ class FindStatCombinatorialStatistic(SageObject):
           sequence. If this is chosen too big, the OEIS result may be
           corrupted.
 
-        - ``verbose`` (default:True) if true, some information about
+        - ``verbose`` (default: ``True``) if true, some information about
           the search are printed.
 
         OUTPUT:
@@ -3654,9 +3653,9 @@ class FindStatCompoundMap(Element, FindStatCombinatorialMap):
 
         - ``id`` -- a padded identifier
 
-        - ``domain``-- (optional), the domain of the compound map
+        - ``domain`` -- (optional), the domain of the compound map
 
-        - ``codomain``-- (optional), the codomain of the compound map
+        - ``codomain`` -- (optional), the codomain of the compound map
 
         - ``check`` -- whether to check that domains and codomains fit
 
@@ -3841,9 +3840,9 @@ class FindStatMatchingMap(FindStatCompoundMap):
 
         - ``quality``, the quality of the match, as provided by FindStat
 
-        - ``domain``-- (optional), the domain of the compound map
+        - ``domain`` -- (optional), the domain of the compound map
 
-        - ``codomain``-- (optional), the codomain of the compound map
+        - ``codomain`` -- (optional), the codomain of the compound map
 
         EXAMPLES::
 
@@ -3974,7 +3973,7 @@ def _plane_partitions_by_size(n):
 
     .. TODO::
 
-        This can be replaced when :trac:`28244` is merged.
+        This can be replaced when :issue:`28244` is merged.
 
     INPUT:
 

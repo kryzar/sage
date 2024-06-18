@@ -135,7 +135,7 @@ def are_mutually_orthogonal_latin_squares(l, verbose=False):
 
     INPUT:
 
-    - ``verbose`` - if ``True`` then print why the list of matrices provided are
+    - ``verbose`` -- if ``True`` then print why the list of matrices provided are
       not mutually orthogonal latin squares
 
     EXAMPLES::
@@ -299,7 +299,7 @@ def mutually_orthogonal_latin_squares(k, n, partitions=False, check=True):
         Unknown
 
     If you ask for such a MOLS then you will respectively get an informative
-    ``EmptySetError`` or ``NotImplementedError``::
+    ``EmptySetError`` or :class:`NotImplementedError`::
 
         sage: designs.mutually_orthogonal_latin_squares(5, 5)
         Traceback (most recent call last):

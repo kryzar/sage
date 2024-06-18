@@ -167,12 +167,14 @@ REFERENCES:
 #                  https://www.gnu.org/licenses/
 # ****************************************************************************
 
+from bisect import bisect_left, bisect_right
+
+from sage.misc.lazy_import import lazy_import
+from sage.rings.integer_ring import ZZ
+from sage.structure.element import is_Matrix
 from sage.structure.unique_representation import UniqueRepresentation
 
-from bisect import bisect_left, bisect_right
-from sage.structure.element import is_Matrix
-from sage.matrix.constructor import matrix
-from sage.rings.integer_ring import ZZ
+lazy_import('sage.matrix.constructor', 'matrix')
 
 
 class Rule(UniqueRepresentation):
@@ -3346,7 +3348,7 @@ def RSK_inverse(p, q, output='array', insertion=InsertionRules.RSK):
         ...
         ValueError: p(=[[1, 2, 3]]) and q(=[[1, 2]]) must have the same shape
 
-    Check that :trac:`20430` is fixed::
+    Check that :issue:`20430` is fixed::
 
         sage: RSK([1,1,1,1,1,1,1,2,2,2,3], [1,1,1,1,1,1,3,2,2,2,1])
         [[[1, 1, 1, 1, 1, 1, 1, 2, 2], [2], [3]],

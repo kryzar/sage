@@ -37,7 +37,7 @@ class QuiverRepHom(CallMorphism):
 
     - ``codomain`` -- :class:`QuiverRep`, the codomain of the homomorphism
 
-    - ``data`` - dict, list, or :class:`QuiverRepElement`
+    - ``data`` -- dict, list, or :class:`QuiverRepElement`
       (default: empty dict),
       with the following meaning:
 
@@ -325,7 +325,7 @@ class QuiverRepHom(CallMorphism):
             sage: h(S.gens()[1]) == y
             True
 
-        The following was an issue during work on :trac:`12630`::
+        The following was an issue during work on :issue:`12630`::
 
             sage: Q = DiGraph({1: {}}).path_semigroup()
             sage: M = Q.I(GF(3), 1)

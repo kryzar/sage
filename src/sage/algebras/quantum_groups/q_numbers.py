@@ -21,6 +21,7 @@ from sage.misc.misc_c import prod
 from sage.rings.integer_ring import ZZ
 from sage.rings.polynomial.laurent_polynomial_ring import LaurentPolynomialRing
 
+
 def q_int(n, q=None):
     r"""
     Return the `q`-analog of the nonnegative integer `n`.
@@ -118,7 +119,7 @@ def q_factorial(n, q=None):
         (p^6 + 2*p^4 + 2*p^2 + 1)/p^3
 
     The `q`-analog of `n!` is only defined for `n` a nonnegative
-    integer (:trac:`11411`)::
+    integer (:issue:`11411`)::
 
         sage: q_factorial(-2)
         Traceback (most recent call last):

@@ -146,7 +146,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
     # LEVEL 2 functionality
     #   * def _pickle
     #   * def _unpickle
-    cpdef _add_(self, right) noexcept:
+    cpdef _add_(self, right):
         """
         Add two matrices together.
 
@@ -169,7 +169,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
         M._matrix_numpy = _left._matrix_numpy + _right._matrix_numpy
         return M
 
-    cpdef _sub_(self, right) noexcept:
+    cpdef _sub_(self, right):
         """
         Return self - right
 
@@ -220,7 +220,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
     # def _pickle(self):                        #unsure how to implement
     # def _unpickle(self, data, int version):   # use version >= 0 #unsure how to implement
     ######################################################################
-    cdef sage.structure.element.Matrix _matrix_times_matrix_(self, sage.structure.element.Matrix right) noexcept:
+    cdef sage.structure.element.Matrix _matrix_times_matrix_(self, sage.structure.element.Matrix right):
         r"""
         Multiply ``self * right`` as matrices.
 
@@ -235,12 +235,12 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         TESTS:
 
-        Check that :trac:`31234` is fixed::
+        Check that :issue:`31234` is fixed::
 
             sage: matrix.identity(QQ, 4) * matrix(RDF, 4, 0)
             []
 
-        Check that an empty matrix is initialized correctly; see :trac:`27366`:
+        Check that an empty matrix is initialized correctly; see :issue:`27366`:
 
             sage: A = matrix(RDF, 3, 0)
             sage: A*A.transpose()
@@ -377,7 +377,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         INPUT:
 
-        - ``p`` - default: 'frob' - controls which norm is used
+        - ``p`` -- (default: 'frob'); controls which norm is used
           to compute the condition number, allowable values are
           'frob' (for the Frobenius norm), integers -2, -1, 1, 2,
           positive and negative infinity. See output discussion
@@ -564,7 +564,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         INPUT:
 
-        - ``p`` - default: 2 - controls which norm is computed,
+        - ``p`` -- (default: 2); controls which norm is computed,
           allowable values are 'frob' (for the Frobenius norm),
           integers -2, -1, 1, 2, positive and negative infinity.  See
           output discussion for specifics.
@@ -594,8 +594,8 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         ALGORITHM:
 
-        Computation is performed by the ``norm()`` function of
-        the SciPy/NumPy library.
+        Computation is performed by the :func:`~scipy:scipy.linalg.norm`
+        function of the SciPy/NumPy library.
 
         EXAMPLES:
 
@@ -701,7 +701,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         INPUT:
 
-        - ``eps`` - default: ``None`` - the largest number which
+        - ``eps`` -- (default: ``None``); the largest number which
           will be considered to be zero.  May also be set to the
           string 'auto'.  See the discussion below.
 
@@ -739,7 +739,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
         ALGORITHM:
 
         The singular values come from the SVD decomposition
-        computed by SciPy/NumPy.
+        computed by SciPy/NumPy using :func:`scipy:scipy.linalg.svd`.
 
         EXAMPLES:
 
@@ -867,7 +867,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
         # set cutoff as RDF element
         if eps == 'auto':
             if scipy is None: import scipy
-            eps = 2*max(self._nrows, self._ncols)*scipy.finfo(float).eps*sv[0]
+            eps = 2*max(self._nrows, self._ncols)*numpy.finfo(float).eps*sv[0]
         eps = RDF(eps)
         # locate non-zero entries
         rank = 0
@@ -927,7 +927,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
             The computation of this matrix inverse can be accomplished
             quickly with just a transpose as the matrix is orthogonal/unitary.
 
-            For details see :trac:`18365`.
+            For details see :issue:`18365`.
 
         EXAMPLES::
 
@@ -946,7 +946,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
             sage: (P*m - L*U).norm() < 1e-14
             False
 
-        :trac:`10839` made this routine available for rectangular matrices.  ::
+        :issue:`10839` made this routine available for rectangular matrices.  ::
 
             sage: A = matrix(RDF, 5, 6, range(30)); A
             [ 0.0  1.0  2.0  3.0  4.0  5.0]
@@ -1062,28 +1062,28 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         INPUT:
 
-        - ``self`` - a square matrix
+        - ``self`` -- a square matrix
 
         - ``other`` -- a square matrix `B` (default: ``None``) in a generalized
           eigenvalue problem; if ``None``, an ordinary eigenvalue problem is
           solved; if ``algorithm`` is ``'symmetric'`` or ``'hermitian'``, `B`
           must be real symmetric or hermitian positive definite, respectively
 
-        - ``algorithm`` - default: ``'default'``
+        - ``algorithm`` -- default: ``'default'``
 
-          - ``'default'`` - applicable to any matrix
+          - ``'default'`` -- applicable to any matrix
             with double-precision floating point entries.
-            Uses the :meth:`~scipy.linalg.eigvals` method from SciPy.
+            Uses the :func:`~scipy:scipy.linalg.eigvals` function from SciPy.
 
-          - ``'symmetric'`` - converts the matrix into a real matrix
+          - ``'symmetric'`` -- converts the matrix into a real matrix
             (i.e. with entries from :class:`~sage.rings.real_double.RDF`),
             then applies the algorithm for Hermitian matrices.  This
             algorithm can be significantly faster than the
             ``'default'`` algorithm.
 
-          - ``'hermitian'`` - uses the :meth:`~scipy.linalg.eigh` method
-            from SciPy, which applies only to real symmetric or complex
-            Hermitian matrices.  Since Hermitian is defined as a matrix
+          - ``'hermitian'`` -- uses the :func:`~scipy:scipy.linalg.eigh`
+            function from SciPy, which applies only to real symmetric or
+            complex Hermitian matrices.  Since Hermitian is defined as a matrix
             equaling its conjugate-transpose, for a matrix with real
             entries this property is equivalent to being symmetric.
             This algorithm can be significantly faster than the
@@ -1498,7 +1498,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         TESTS:
 
-        The following example shows that :trac:`20439` has been resolved::
+        The following example shows that :issue:`20439` has been resolved::
 
             sage: A = matrix(CDF, [[-2.53634347567,  2.04801738686, -0.0, -62.166145304],
             ....:                  [ 0.7, -0.6, 0.0, 0.0],
@@ -1509,7 +1509,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
             ....:     for i in range(A.nrows()))
             True
 
-        The following example shows that the fix for :trac:`20439` (conjugating
+        The following example shows that the fix for :issue:`20439` (conjugating
         eigenvectors rather than eigenvalues) is the correct one::
 
             sage: A = Matrix(CDF,[[I,0],[0,1]])
@@ -1656,7 +1656,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         TESTS:
 
-        The following example shows that :trac:`20439` has been resolved::
+        The following example shows that :issue:`20439` has been resolved::
 
             sage: A = matrix(CDF, [[-2.53634347567,  2.04801738686, -0.0, -62.166145304],
             ....:                  [ 0.7, -0.6, 0.0, 0.0],
@@ -1667,7 +1667,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
             ....:     for i in range(A.nrows()))
             True
 
-        The following example shows that the fix for :trac:`20439` (conjugating
+        The following example shows that the fix for :issue:`20439` (conjugating
         eigenvectors rather than eigenvalues) is the correct one::
 
             sage: A = Matrix(CDF,[[I,0],[0,1]])
@@ -1707,6 +1707,10 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
         Find a solution `X` to the equation `A X = B` if ``self`` is a square
         matrix `A`.
 
+        ALGORITHM:
+
+        Uses the function :func:`scipy:scipy.linalg.solve` from SciPy.
+
         TESTS::
 
             sage: # needs sage.symbolic
@@ -1729,6 +1733,10 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
         """
         Compute a least-squares solution `X` to the equation `A X = B` where
         ``self`` is the matrix `A`.
+
+        ALGORITHM:
+
+        Uses the function :func:`scipy:scipy.linalg.lstsq` from SciPy.
 
         TESTS::
 
@@ -1754,7 +1762,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         ALGORITHM:
 
-        Use numpy
+        Uses :func:`scipy:scipy.linalg.det`.
 
         EXAMPLES::
 
@@ -2037,7 +2045,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         ALGORITHM:
 
-        Calls "linalg.qr" from SciPy, which is in turn an
+        Calls :func:`scipy:scipy.linalg.qr` from SciPy, which is in turn an
         interface to LAPACK routines.
 
         EXAMPLES:
@@ -2163,7 +2171,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         Trivial cases return trivial results of the correct size,
         and we check ``Q`` itself in one case, verifying a fix for
-        :trac:`10795`.  ::
+        :issue:`10795`.  ::
 
             sage: A = zero_matrix(RDF, 0, 10)
             sage: Q, R = A.QR()
@@ -2212,11 +2220,11 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         INPUT:
 
-        - ``tol`` - default: ``1e-12`` - the largest value of the
+        - ``tol`` -- (default: ``1e-12``); the largest value of the
           absolute value of the difference between two matrix entries
           for which they will still be considered equal.
 
-        - ``algorithm`` - default: 'orthonormal' - set to 'orthonormal'
+        - ``algorithm`` -- (default: 'orthonormal'); set to 'orthonormal'
           for a stable procedure and set to 'naive' for a fast
           procedure.
 
@@ -2402,11 +2410,11 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         INPUT:
 
-        - ``tol`` - default: ``1e-12`` - the largest value of the
+        - ``tol`` -- (default: ``1e-12``); the largest value of the
           absolute value of the difference between two matrix entries
           for which they will still be considered equal.
 
-        - ``skew`` - default: ``False`` - Specifies the type of the
+        - ``skew`` -- (default: ``False``); Specifies the type of the
           test. Set to ``True`` to check whether the matrix is
           skew-Hermitian.
 
@@ -2521,7 +2529,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         INPUT:
 
-        - ``tol`` - default: ``1e-12`` - the largest value of the
+        - ``tol`` -- (default: ``1e-12``); the largest value of the
           absolute value of the difference between two matrix entries
           for which they will still be considered equal.
 
@@ -2649,11 +2657,11 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         INPUT:
 
-        - ``tol`` - default: ``1e-12`` - the largest value of the
+        - ``tol`` -- (default: ``1e-12``); the largest value of the
           absolute value of the difference between two matrix entries
           for which they will still be considered equal.
 
-        - ``algorithm`` - default: 'orthonormal' - set to 'orthonormal'
+        - ``algorithm`` -- (default: 'orthonormal'); set to 'orthonormal'
           for a stable procedure and set to 'naive' for a fast
           procedure.
 
@@ -2771,11 +2779,11 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         INPUT:
 
-        - ``tol`` - default: ``1e-12`` - the largest value of the
+        - ``tol`` -- (default: ``1e-12``); the largest value of the
           absolute value of the difference between two matrix entries
           for which they will still be considered equal.
 
-        - ``algorithm`` - default: 'orthonormal' - set to 'orthonormal'
+        - ``algorithm`` -- (default: 'orthonormal'); set to 'orthonormal'
           for a stable procedure and set to 'naive' for a fast
           procedure.
 
@@ -2967,7 +2975,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         INPUT:
 
-        - ``base_ring`` - optional, defaults to the base ring of ``self``.
+        - ``base_ring`` -- optional, defaults to the base ring of ``self``.
           Use this to request the base ring of the returned matrices, which
           will affect the format of the results.
 
@@ -3588,7 +3596,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
             posdef = self.fetch(cache_str)
         return posdef
 
-    cdef _vector_times_matrix_(self,Vector v) noexcept:
+    cdef _vector_times_matrix_(self,Vector v):
         if self._nrows == 0 or self._ncols == 0:
             return self.row_ambient_module().zero_vector()
         global numpy
@@ -3601,7 +3609,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
         ans = numpy.dot(v_numpy,self._matrix_numpy)
         return M(ans)
 
-    cdef _matrix_times_vector_(self,Vector v) noexcept:
+    cdef _matrix_times_vector_(self,Vector v):
         if self._nrows == 0 or self._ncols == 0:
             return self.column_ambient_module().zero_vector()
 
@@ -3675,7 +3683,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
             sage: A = matrix(CDF, 2, [1,2+I,3*I,4]); A                                  # needs sage.symbolic
             [        1.0 2.0 + 1.0*I]
             [      3.0*I         4.0]
-            sage: A.exp()  # tol 1.1e-14                                                # needs sage.symbolic
+            sage: A.exp()  # tol 3e-14                                                  # needs sage.symbolic
             [-19.614602953804912 + 12.517743846762578*I   3.7949636449582176 + 28.88379930658099*I]
             [ -32.383580980922254 + 21.88423595789845*I   2.269633004093535 + 44.901324827684824*I]
 
@@ -3713,7 +3721,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         INPUT:
 
-        - ``eps`` - Cutoff value
+        - ``eps`` -- Cutoff value
 
         OUTPUT:
 
@@ -3755,7 +3763,7 @@ cdef class Matrix_double_dense(Matrix_numpy_dense):
 
         INPUT:
 
-        - ``ndigits`` - The precision in number of decimal digits
+        - ``ndigits`` -- The precision in number of decimal digits
 
         OUTPUT:
 

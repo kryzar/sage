@@ -137,13 +137,13 @@ cdef class ToricRationalDivisorClass(Vector_rational_dense):
                 (self._parent, list(self), self._degree,
                  not self._is_immutable))
 
-    cpdef _act_on_(self, other, bint self_on_left) noexcept:
+    cpdef _act_on_(self, other, bint self_on_left):
         """
         Act on ``other``.
 
         INPUT:
 
-        - ``other`` - something that
+        - ``other`` -- something that
           :class:`~sage.modules.vector_rational_dense.Vector_rational_dense`
           can act on *except* for another toric rational divisor class.
 
@@ -202,19 +202,19 @@ cdef class ToricRationalDivisorClass(Vector_rational_dense):
         # Now let the standard framework work...
         return Vector_rational_dense._act_on_(self, other, self_on_left)
 
-    cpdef _dot_product_(self, Vector right) noexcept:
+    cpdef _dot_product_(self, Vector right):
         r"""
-        Raise a ``TypeError`` exception.
+        Raise a :class:`TypeError` exception.
 
         Dot product is not defined on toric rational divisor classes.
 
         INPUT:
 
-        - ``right`` - vector.
+        - ``right`` -- vector.
 
         OUTPUT:
 
-        - ``TypeError`` exception is raised.
+        A :class:`TypeError` exception is raised.
 
         TESTS::
 

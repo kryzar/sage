@@ -170,14 +170,14 @@ cdef class Heilbronn:
                       self.list.v[4*i+2], self.list.v[4*i+3]])
         return L
 
-    cdef apply_only(self, int u, int v, int N, int* a, int* b) noexcept:
+    cdef apply_only(self, int u, int v, int N, int* a, int* b):
         """
         INPUT:
 
 
-        -  ``u, v, N`` - integers
+        -  ``u, v, N`` -- integers
 
-        -  ``a, b`` - preallocated int arrays of the length
+        -  ``a, b`` -- preallocated int arrays of the length
            self.
 
 
@@ -210,14 +210,14 @@ cdef class Heilbronn:
                 b[i] = llong_prod_mod(u,self.list.v[4*i+1],N) + llong_prod_mod(v,self.list.v[4*i+3], N)
         sig_off()
 
-    cdef apply_to_polypart(self, fmpz_poly_t* ans, int i, int k) noexcept:
+    cdef apply_to_polypart(self, fmpz_poly_t* ans, int i, int k):
         r"""
         INPUT:
 
-        -  ``ans`` - fmpz_poly_t\*; pre-allocated an
+        -  ``ans`` -- fmpz_poly_t\*; pre-allocated an
            initialized array of self.length fmpz_poly_t's
-        -  ``i`` - integer
-        -  ``k`` - integer
+        -  ``i`` -- integer
+        -  ``k`` -- integer
 
         OUTPUT: sets entries of ans
         """
@@ -525,9 +525,9 @@ def hecke_images_gamma0_weight2(int u, int v, int N, indices, R):
     """
     INPUT:
 
-    - ``u, v, N`` - integers so that gcd(u,v,N) = 1
-    - ``indices`` - a list of positive integers
-    - ``R`` - matrix over QQ that writes each elements of
+    - ``u, v, N`` -- integers so that gcd(u,v,N) = 1
+    - ``indices`` -- a list of positive integers
+    - ``R`` -- matrix over QQ that writes each elements of
       P1 = P1List(N) in terms of a subset of P1.
 
 
@@ -650,11 +650,11 @@ def hecke_images_nonquad_character_weight2(int u, int v, int N, indices, chi, R)
 
     INPUT:
 
-    - ``u, v, N`` - integers so that gcd(u,v,N) = 1
-    - ``indices`` - a list of positive integers
-    - ``chi`` - a Dirichlet character that takes values
+    - ``u, v, N`` -- integers so that gcd(u,v,N) = 1
+    - ``indices`` -- a list of positive integers
+    - ``chi`` -- a Dirichlet character that takes values
       in a nontrivial extension of QQ.
-    - ``R`` - matrix over QQ that writes each elements of
+    - ``R`` -- matrix over QQ that writes each elements of
       P1 = P1List(N) in terms of a subset of P1.
 
 
@@ -755,10 +755,10 @@ def hecke_images_quad_character_weight2(int u, int v, int N, indices, chi, R):
     """
     INPUT:
 
-    - ``u, v, N`` - integers so that gcd(u,v,N) = 1
-    - ``indices`` - a list of positive integers
-    - ``chi`` - a Dirichlet character that takes values in QQ
-    - ``R`` - matrix over QQ(chi) that writes each elements of P1 =
+    - ``u, v, N`` -- integers so that gcd(u,v,N) = 1
+    - ``indices`` -- a list of positive integers
+    - ``chi`` -- a Dirichlet character that takes values in QQ
+    - ``R`` -- matrix over QQ(chi) that writes each elements of P1 =
        P1List(N) in terms of a subset of P1.
 
 
@@ -853,11 +853,11 @@ def hecke_images_gamma0_weight_k(int u, int v, int i, int N, int k, indices, R):
     """
     INPUT:
 
-    -  ``u, v, N`` - integers so that gcd(u,v,N) = 1
-    -  ``i`` - integer with 0 <= i <= k-2
-    -  ``k`` - weight
-    -  ``indices`` - a list of positive integers
-    -  ``R`` - matrix over QQ that writes each elements of
+    -  ``u, v, N`` -- integers so that gcd(u,v,N) = 1
+    -  ``i`` -- integer with 0 <= i <= k-2
+    -  ``k`` -- weight
+    -  ``indices`` -- a list of positive integers
+    -  ``R`` -- matrix over QQ that writes each elements of
        P1 = P1List(N) in terms of a subset of P1.
 
     OUTPUT: a dense matrix with rational entries whose columns are the

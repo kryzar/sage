@@ -31,6 +31,7 @@ from sage.categories.tensor import TensorProductsCategory
 from sage.categories.morphism import Morphism
 from sage.categories.homset import Hom, Homset
 
+
 class Crystals(Category_singleton):
     r"""
     The category of crystals.
@@ -410,9 +411,9 @@ class Crystals(Category_singleton):
             - ``direction`` -- (default: ``'both'``) the direction to build
               the subcrystal; it can be one of the following:
 
-              - ``'both'`` - using both `e_i` and `f_i`
-              - ``'upper'`` - using `e_i`
-              - ``'lower'`` - using `f_i`
+              - ``'both'`` -- using both `e_i` and `f_i`
+              - ``'upper'`` -- using `e_i`
+              - ``'lower'`` -- using `f_i`
 
             - ``contained`` -- (optional) a set or function defining the
               containment in the subcrystal
@@ -482,7 +483,7 @@ class Crystals(Category_singleton):
 
             TESTS:
 
-            Check that :trac:`23942` is fixed::
+            Check that :issue:`23942` is fixed::
 
                 sage: B = crystals.infinity.Tableaux(['A',2])
                 sage: S = B.subcrystal(max_depth=3, category=HighestWeightCrystals())
@@ -877,7 +878,7 @@ class Crystals(Category_singleton):
 
             TESTS:
 
-            We check that infinite crystals raise an error (:trac:`21986`)::
+            We check that infinite crystals raise an error (:issue:`21986`)::
 
                 sage: B = crystals.infinity.Tableaux(['A',2])
                 sage: B.digraph()
@@ -1008,7 +1009,7 @@ class Crystals(Category_singleton):
 
             - ``thicklines`` -- (default: ``True``) for thicker edges
 
-            - ``labels`` -- (default: False) to suppress labeling of the vertices
+            - ``labels`` -- (default: ``False``) to suppress labeling of the vertices
 
             - ``scaling_factor`` -- (default: ``1.0``) Increasing or decreasing the
               scaling factor changes the size of the image
@@ -1713,9 +1714,9 @@ class Crystals(Category_singleton):
             - ``direction`` -- (default: ``'both'``) the direction to build
               the subcrystal; it can be one of the following:
 
-              - ``'both'`` - using both `e_i` and `f_i`
-              - ``'upper'`` - using `e_i`
-              - ``'lower'`` - using `f_i`
+              - ``'both'`` -- using both `e_i` and `f_i`
+              - ``'upper'`` -- using `e_i`
+              - ``'lower'`` -- using `f_i`
 
             - ``contained`` -- (optional) a set (or function) defining the
               containment in the subcrystal
@@ -1744,7 +1745,7 @@ class Crystals(Category_singleton):
 
             TESTS:
 
-            Check that :trac:`23942` is fixed::
+            Check that :issue:`23942` is fixed::
 
                 sage: K = crystals.KirillovReshetikhin(['A',2,1], 1,1)
                 sage: cat = HighestWeightCrystals().Finite()
@@ -1821,6 +1822,7 @@ class Crystals(Category_singleton):
 
 ###############################################################################
 ## Morphisms
+
 
 class CrystalMorphism(Morphism):
     r"""
@@ -1985,7 +1987,7 @@ class CrystalMorphism(Morphism):
             sage: H = Hom(T, B)
             sage: b = B.module_generators[0]
             sage: psi = H((None, b, b, None), generators=T.highest_weight_vectors())
-            sage: psi(None)
+            sage: psi(None)                                                             # needs sage.symbolic
             sage: [psi(v) for v in T.highest_weight_vectors()]
             [None, [[1, 1], [2]], [[1, 1], [2]], None]
         """
@@ -2020,6 +2022,7 @@ class CrystalMorphism(Morphism):
             Finite family {1: 2, 2: 2, 3: 1}
         """
         return self._scaling_factors
+
 
 class CrystalMorphismByGenerators(CrystalMorphism):
     r"""
@@ -2327,6 +2330,7 @@ class CrystalMorphismByGenerators(CrystalMorphism):
 
 ###############################################################################
 ## Homset
+
 
 class CrystalHomset(Homset):
     r"""

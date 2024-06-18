@@ -12,6 +12,7 @@ For background, see :ref:`What is a facade set? <facade-sets>`.
 
 from sage.categories.category_with_axiom import CategoryWithAxiom
 
+
 class FacadeSets(CategoryWithAxiom):
     def example(self, choice='subset'):
         r"""
@@ -118,7 +119,7 @@ class FacadeSets(CategoryWithAxiom):
                 sage: S.facade_for()
                 (Integer Ring,)
 
-            Check that :trac:`13801` is corrected::
+            Check that :issue:`13801` is corrected::
 
                 sage: class A(Parent):
                 ....:     def __init__(self):

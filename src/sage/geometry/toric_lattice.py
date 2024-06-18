@@ -147,7 +147,8 @@ Or you can create a homomorphism from one lattice to any other::
 
 from sage.geometry.toric_lattice_element import (ToricLatticeElement,
                                                  is_ToricLatticeElement)
-from sage.geometry.toric_plotter import ToricPlotter
+from sage.misc.lazy_import import lazy_import
+lazy_import('sage.geometry.toric_plotter', 'ToricPlotter')
 from sage.misc.latex import latex
 from sage.structure.all import parent
 from sage.structure.richcmp import (richcmp_method, richcmp, rich_to_bool,
@@ -599,7 +600,7 @@ class ToricLattice_generic(FreeModule_generic_pid):
 
         INPUT:
 
-        - ``other`` - a toric (sub)lattice.dual
+        - ``other`` -- a toric (sub)lattice.dual
 
         OUTPUT:
 
@@ -644,7 +645,7 @@ class ToricLattice_generic(FreeModule_generic_pid):
 
         - ``sub`` -- sublattice of self;
 
-        - ``check`` -- (default: True) whether or not to check that ``sub`` is
+        - ``check`` -- (default: ``True``) whether or not to check that ``sub`` is
           a valid sublattice.
 
         If the quotient is one-dimensional and torsion free, the
@@ -706,7 +707,7 @@ class ToricLattice_generic(FreeModule_generic_pid):
 
         TESTS:
 
-        We check that :trac:`19603` is fixed::
+        We check that :issue:`19603` is fixed::
 
             sage: K = Cone([(1,0,0),(0,1,0)])
             sage: K.lattice()
@@ -1511,7 +1512,7 @@ class ToricLattice_quotient(FGP_Module_class):
             raise ValueError('You may not specify both positive_point and positive_dual_point.')
         self._flip_sign_of_generator = (scalar_product < 0)
 
-    def gens(self):
+    def gens(self) -> tuple:
         """
         Return the generators of the quotient.
 
