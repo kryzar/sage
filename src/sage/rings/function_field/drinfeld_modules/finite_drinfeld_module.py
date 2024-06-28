@@ -259,7 +259,7 @@ class DrinfeldModule_finite(DrinfeldModule):
         deg = self.base_over_constants_field().degree_over()
         return self._Hom_(self, category=self.category())(t**deg)
 
-    def frobenius_charpoly(self, var='X', algorithm='crystalline'):
+    def frobenius_charpoly(self, var='X', algorithm=None):
         r"""
         Return the characteristic polynomial of the Frobenius
         endomorphism.
@@ -308,7 +308,7 @@ class DrinfeldModule_finite(DrinfeldModule):
             - ``'gekeler'`` -- it tries to identify coefficients by
               writing that the characteristic polynomial annihilates the
               Frobenius endomorphism; this algorithm may fail is some
-              cases (see [Gek1991]_).
+              cases (see [Gek2008]_).
             - ``'motive'`` -- it uses the action of the Frobenius on the
               Anderson motive (see Chapter 2 of [CL2023]_).
 
