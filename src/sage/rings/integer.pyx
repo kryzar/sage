@@ -326,6 +326,10 @@ def is_Integer(x):
 
         sage: from sage.rings.integer import is_Integer
         sage: is_Integer(2)
+        doctest:warning...
+        DeprecationWarning: The function is_Integer is deprecated;
+        use 'isinstance(..., Integer)' instead.
+        See https://github.com/sagemath/sage/issues/38128 for details.
         True
         sage: is_Integer(2/1)
         False
@@ -334,6 +338,10 @@ def is_Integer(x):
         sage: is_Integer('5')
         False
     """
+    from sage.misc.superseded import deprecation_cython
+    deprecation_cython(38128,
+                       "The function is_Integer is deprecated; "
+                       "use 'isinstance(..., Integer)' instead.")
     return isinstance(x, Integer)
 
 
@@ -585,6 +593,8 @@ cdef class Integer(sage.structure.element.EuclideanDomainElement):
         Test comparisons with numpy types (see :issue:`13386` and :issue:`18076`)::
 
             sage: import numpy                                                          # needs numpy
+            sage: if int(numpy.version.short_version[0]) > 1:                           # needs numpy
+            ....:     numpy.set_printoptions(legacy="1.25")                             # needs numpy
             sage: numpy.int8('12') == 12                                                # needs numpy
             True
             sage: 12 == numpy.int8('12')                                                # needs numpy

@@ -291,9 +291,9 @@ cdef class Matrix(Matrix0):
             sage: a._mathematica_init_()                                                # needs sage.symbolic
             '{{Pi, Sin[x]}, {Cos[x], Exp[-1]}}'
         """
-        return '{' + ', '.join([v._mathematica_init_() for v in self.rows()]) + '}'
+        return '{' + ', '.join(v._mathematica_init_() for v in self.rows()) + '}'
 
-    def _magma_init_(self, magma):
+    def _magma_init_(self, magma) -> str:
         r"""
         Return a string that evaluates in the given Magma session to this
         matrix.
@@ -705,12 +705,15 @@ cdef class Matrix(Matrix0):
         Type ``numpy.typecodes`` for a list of the possible
         typecodes::
 
-            sage: import numpy                                                          # needs numpy
-            sage: sorted(numpy.typecodes.items())                                       # needs numpy
+            sage: import numpy                            # needs numpy
+            sage: numpy.typecodes.items()                 # needs numpy # random
             [('All', '?bhilqpBHILQPefdgFDGSUVOMm'), ('AllFloat', 'efdgFDG'),
-             ('AllInteger', 'bBhHiIlLqQpP'), ('Character', 'c'), ('Complex', 'FDG'),
-             ('Datetime', 'Mm'), ('Float', 'efdg'), ('Integer', 'bhilqp'),
-             ('UnsignedInteger', 'BHILQP')]
+            ...
+
+        For instance, you can see possibilities for real floating point numbers::
+
+            sage: numpy.typecodes['Float']                # needs numpy
+            'efdg'
 
         Alternatively, numpy automatically calls this function (via
         the magic :meth:`__array__` method) to convert Sage matrices

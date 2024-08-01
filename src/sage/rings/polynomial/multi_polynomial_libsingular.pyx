@@ -226,7 +226,7 @@ import sage.structure.element
 
 from sage.rings.rational cimport Rational
 from sage.rings.rational_field import QQ
-from sage.rings.integer_ring import is_IntegerRing, ZZ
+from sage.rings.integer_ring import IntegerRing_class, ZZ
 from sage.rings.integer cimport Integer
 from sage.rings.number_field.number_field_base cimport NumberField
 
@@ -1876,6 +1876,7 @@ cdef class MPolynomialRing_libsingular(MPolynomialRing_base):
             tempvector = addwithcarry(tempvector, maxvector, pos, _ring)
             M.append(new_MP(self, p_Copy(tempvector, _ring)))
         return M
+
 
 def unpickle_MPolynomialRing_libsingular(base_ring, names, term_order):
     """
@@ -5489,7 +5490,7 @@ cdef class MPolynomial_libsingular(MPolynomial_libsingular_base):
         if n_GetChar(_ring.cf) > 1<<29:
             raise NotImplementedError("Resultants of multivariate polynomials over prime fields with characteristic > 2^29 is not implemented.")
 
-        if is_IntegerRing(self._parent._base):
+        if isinstance(self._parent._base, IntegerRing_class):
             ret = self.change_ring(QQ).resultant(other.change_ring(QQ),
                                                  variable.change_ring(QQ))
             return ret.change_ring(ZZ)

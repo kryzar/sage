@@ -37,20 +37,21 @@ AUTHORS:
 #                   http://www.gnu.org/licenses/
 # *****************************************************************************
 
-from sage.rings.integer_ring import ZZ
-from sage.rings.real_mpfr import RR
-from sage.rings.cc import CC
-from sage.schemes.generic.homset import SchemeHomset_points, SchemeHomset_generic
+from copy import copy
 
-from sage.misc.verbose import verbose
-
-from sage.rings.rational_field import is_RationalField
 from sage.categories.fields import Fields
 from sage.categories.number_fields import NumberFields
+from sage.misc.lazy_import import lazy_import
+from sage.misc.verbose import verbose
 from sage.rings.finite_rings.finite_field_base import FiniteField
+from sage.rings.integer_ring import ZZ
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+from sage.rings.rational_field import RationalField
 from sage.schemes.generic.algebraic_scheme import AlgebraicScheme_subscheme
-from copy import copy
+from sage.schemes.generic.homset import SchemeHomset_points, SchemeHomset_generic
+
+lazy_import('sage.rings.cc', 'CC')
+lazy_import('sage.rings.real_mpfr', 'RR')
 
 
 # *******************************************************************
@@ -274,7 +275,7 @@ class SchemeHomset_points_projective_field(SchemeHomset_points):
         B = kwds.pop('bound', 0)
         tol = kwds.pop('tolerance', 1e-2)
         prec = kwds.pop('precision', 53)
-        if is_RationalField(R):
+        if isinstance(R, RationalField):
             if not B > 0:
                 raise TypeError("a positive bound B (= %s) must be specified" % B)
             if isinstance(X, AlgebraicScheme_subscheme): # sieve should only be called for subschemes

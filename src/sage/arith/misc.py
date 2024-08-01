@@ -2277,7 +2277,7 @@ def power_mod(a, n, m):
 
         sage: from numpy import int32                                                   # needs numpy
         sage: power_mod(int32(2), int32(390), int32(391))                               # needs numpy
-        285
+        ...285...
         sage: from gmpy2 import mpz
         sage: power_mod(mpz(2), mpz(390), mpz(391))
         mpz(285)
@@ -3748,9 +3748,9 @@ def binomial(x, m, **kwds):
     Some floating point cases -- see :issue:`7562`, :issue:`9633`, and
     :issue:`12448`::
 
-        sage: binomial(1., 3)
+        sage: binomial(1., 3)                                                           # needs sage.rings.real_mpfr
         0.000000000000000
-        sage: binomial(-2., 3)
+        sage: binomial(-2., 3)                                                          # needs sage.rings.real_mpfr
         -4.00000000000000
         sage: binomial(0.5r, 5)
         0.02734375

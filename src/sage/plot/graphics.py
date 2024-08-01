@@ -61,10 +61,18 @@ def is_Graphics(x):
 
         sage: from sage.plot.graphics import is_Graphics
         sage: is_Graphics(1)
+        doctest:warning...
+        DeprecationWarning: The function is_Graphics is deprecated;
+        use 'isinstance(..., Graphics)' instead.
+        See https://github.com/sagemath/sage/issues/38184 for details.
         False
         sage: is_Graphics(disk((0.0, 0.0), 1, (0, pi/2)))                               # needs sage.symbolic
         True
     """
+    from sage.misc.superseded import deprecation
+    deprecation(38184,
+                "The function is_Graphics is deprecated; "
+                "use 'isinstance(..., Graphics)' instead.")
     return isinstance(x, Graphics)
 
 
@@ -309,7 +317,7 @@ class Graphics(WithEqualityById, SageObject):
             sage: P.legend()
             False
             sage: P.legend(True)
-            sage: P  #  show with the legend
+            sage: P  # show with the legend
             Graphics object consisting of 1 graphics primitive
         """
         if show is None:
@@ -428,7 +436,17 @@ class Graphics(WithEqualityById, SageObject):
 
         ::
 
-            sage: p.set_legend_options(loc=(0.5,0.5)); p  # aligns the bottom of the box to the center                  # needs sage.symbolic
+            sage: p.set_legend_options(loc=(0.5,0.5)); p  # aligns the bottom of the box to the center                # needs sage.symbolic
+            Graphics object consisting of 1 graphics primitive
+
+        The parameters ``loc`` and ``borderaxespad`` can be altered
+        in order to place the legend below the x-axis label or to
+        the left of the y-axis label::
+
+            sage: p = line([(0, 0), (1, 1)], legend_label='test')
+            sage: p.axes_labels(['X-Label', 'Y-Label'])  # adding labels for axes
+            sage: p.set_legend_options(loc=8, borderaxespad=-7.5-0.01*p.fontsize())
+            sage: p
             Graphics object consisting of 1 graphics primitive
         """
         if len(kwds) == 0:
@@ -2438,7 +2456,7 @@ class Graphics(WithEqualityById, SageObject):
         x_formatter, y_formatter = tick_formatter
         from matplotlib.ticker import FuncFormatter, FixedFormatter
         from sage.misc.latex import latex
-        from sage.symbolic.ring import SR
+        from sage.structure.element import Expression
         from .misc import _multiple_of_constant
         # ---------------------- Formatting x-ticks ----------------------
         if x_formatter is None:
@@ -2446,7 +2464,7 @@ class Graphics(WithEqualityById, SageObject):
                 x_formatter = LogFormatterMathtext(base=base[0])
             else:
                 x_formatter = ScalarFormatter()
-        elif x_formatter in SR:
+        elif isinstance(x_formatter, Expression):
             x_const = x_formatter
             x_formatter = FuncFormatter(lambda n, pos:
                                         _multiple_of_constant(n, pos, x_const))
@@ -2475,7 +2493,7 @@ class Graphics(WithEqualityById, SageObject):
                 y_formatter = LogFormatterMathtext(base=base[1])
             else:
                 y_formatter = ScalarFormatter()
-        elif y_formatter in SR:
+        elif isinstance(y_formatter, Expression):
             y_const = y_formatter
             y_formatter = FuncFormatter(lambda n, pos:
                                         _multiple_of_constant(n, pos, y_const))
@@ -2746,7 +2764,7 @@ class Graphics(WithEqualityById, SageObject):
             sage: xmin, xmax = sub.get_xlim()
             sage: ymin, ymax = sub.get_ylim()
             sage: xmin > xmax, ymin > ymax
-            (True, True)
+            (...True..., ...True...)
         """
         if not isinstance(ticks, (list, tuple)):
             ticks = (ticks, None)
@@ -2763,10 +2781,10 @@ class Graphics(WithEqualityById, SageObject):
         if stylesheet in plt.style.available:
             plt.style.use(stylesheet)
 
-        from sage.symbolic.ring import SR
+        from sage.structure.element import Expression
         # make sure both formatters typeset or both don't
         if not isinstance(tick_formatter, (list, tuple)):
-            if tick_formatter == "latex" or tick_formatter in SR:
+            if tick_formatter == "latex" or isinstance(tick_formatter, Expression):
                 tick_formatter = (tick_formatter, "latex")
             else:
                 tick_formatter = (tick_formatter, None)

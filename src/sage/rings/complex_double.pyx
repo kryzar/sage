@@ -706,10 +706,18 @@ def is_ComplexDoubleElement(x):
 
         sage: from sage.rings.complex_double import is_ComplexDoubleElement
         sage: is_ComplexDoubleElement(0)
+        doctest:warning...
+        DeprecationWarning: The function is_ComplexDoubleElement is deprecated;
+        use 'isinstance(..., ComplexDoubleElement)' instead.
+        See https://github.com/sagemath/sage/issues/38128 for details.
         False
         sage: is_ComplexDoubleElement(CDF(0))
         True
     """
+    from sage.misc.superseded import deprecation_cython
+    deprecation_cython(38128,
+                       "The function is_ComplexDoubleElement is deprecated; "
+                       "use 'isinstance(..., ComplexDoubleElement)' instead.")
     return isinstance(x, ComplexDoubleElement)
 
 
@@ -2550,10 +2558,10 @@ cdef class ComplexToCDF(Morphism):
 
         sage: # needs numpy
         sage: import numpy
-        sage: f = CDF.coerce_map_from(numpy.complex_)
-        sage: f(numpy.complex_(I))
+        sage: f = CDF.coerce_map_from(numpy.complex128)
+        sage: f(numpy.complex128(I))
         1.0*I
-        sage: f(numpy.complex_(I)).parent()
+        sage: f(numpy.complex128(I)).parent()
         Complex Double Field
     """
     def __init__(self, R):
@@ -2570,7 +2578,7 @@ cdef class ComplexToCDF(Morphism):
         EXAMPLES::
 
             sage: import numpy                                                          # needs numpy
-            sage: CDF(numpy.complex_(I))    # indirect doctest                          # needs numpy
+            sage: CDF(numpy.complex128(I))    # indirect doctest                          # needs numpy
             1.0*I
         """
         cdef ComplexDoubleElement z = <ComplexDoubleElement>ComplexDoubleElement.__new__(ComplexDoubleElement)
@@ -2584,7 +2592,7 @@ cdef class ComplexToCDF(Morphism):
         EXAMPLES::
 
             sage: import numpy                                                          # needs numpy
-            sage: f = sage.rings.complex_double.ComplexToCDF(numpy.complex_)            # needs numpy
+            sage: f = sage.rings.complex_double.ComplexToCDF(numpy.complex128)          # needs numpy
             sage: f._repr_type()                                                        # needs numpy
             'Native'
         """

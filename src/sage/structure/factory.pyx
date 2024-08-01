@@ -171,9 +171,9 @@ cdef class UniqueFactory(SageObject):
         ....:         return args, {'impl':kwds.get('impl', None)}
         ....:     def create_object(self, version, key, **extra_args):
         ....:         impl = extra_args['impl']
-        ....:         if impl=='C':
+        ....:         if impl == 'C':
         ....:             return C(*key)
-        ....:         if impl=='D':
+        ....:         if impl == 'D':
         ....:             return D(*key)
         ....:         return E(*key)
         ....:
@@ -520,7 +520,7 @@ cdef class UniqueFactory(SageObject):
         The ``GF`` factory used to have a custom :meth:`other_keys`
         method, but this was removed in :issue:`16934`::
 
-            sage: # needs sage.libs.linbox sage.ring.finite_rings
+            sage: # needs sage.libs.linbox sage.rings.finite_rings
             sage: key, _ = GF.create_key_and_extra_args(27, 'k'); key
             (27, ('k',), x^3 + 2*x + 1, 'givaro', 3, 3, True, None, 'poly', True, True, True)
             sage: K = GF.create_object(0, key); K

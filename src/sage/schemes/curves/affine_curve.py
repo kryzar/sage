@@ -124,33 +124,32 @@ AUTHORS:
 #                  https://www.gnu.org/licenses/
 # ****************************************************************************
 
-import sage.rings.abc
-
-from sage.misc.lazy_attribute import lazy_attribute
-from sage.misc.cachefunc import cached_method
-
-from sage.arith.misc import binomial
-from sage.interfaces.singular import singular
 from builtins import sum as add
 
+import sage.rings.abc
+
+from sage.arith.misc import binomial
 from sage.categories.fields import Fields
 from sage.categories.finite_fields import FiniteFields
 from sage.categories.homset import Hom, End, hom
 from sage.categories.number_fields import NumberFields
-
 from sage.matrix.constructor import matrix
-
+from sage.misc.cachefunc import cached_method
+from sage.misc.lazy_attribute import lazy_attribute
 from sage.misc.lazy_import import lazy_import
-
+from sage.rings.infinity import infinity
 from sage.rings.polynomial.multi_polynomial_element import degree_lowest_rational_function
-from sage.rings.number_field.number_field import NumberField
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
-from sage.rings.rational_field import is_RationalField
+from sage.rings.rational_field import RationalField
 from sage.rings.infinity import infinity
 
 from sage.schemes.affine.affine_space import AffineSpace, AffineSpace_generic
 from sage.schemes.affine.affine_subscheme import (AlgebraicScheme_subscheme_affine,
                                                   AlgebraicScheme_subscheme_affine_field)
+
+lazy_import('sage.interfaces.singular', 'singular')
+lazy_import('sage.rings.number_field.number_field', 'NumberField')
+lazy_import('sage.rings.qqbar', 'number_field_elements_from_algebraics')
 
 from .curve import Curve_generic
 
@@ -163,8 +162,6 @@ from .point import (AffineCurvePoint_field,
                     IntegralAffinePlaneCurvePoint_finite_field)
 
 from .closed_point import IntegralAffineCurveClosedPoint
-
-lazy_import('sage.rings.qqbar', 'number_field_elements_from_algebraics')
 
 
 class AffineCurve(Curve_generic, AlgebraicScheme_subscheme_affine):
@@ -1548,10 +1545,10 @@ class AffineCurve_field(AffineCurve, AlgebraicScheme_subscheme_affine_field):
             pts = self.change_ring(F.embeddings(QQbar)[0]).rational_points()
             L = [t for pt in pts for t in pt]
             K = number_field_elements_from_algebraics(L)[0]
-            if is_RationalField(K):
+            if isinstance(K, RationalField):
                 return F.embeddings(F)[0]
             else:
-                if is_RationalField(F):
+                if isinstance(F, RationalField):
                     return F.embeddings(K)[0]
                 else:
                     # make sure the defining polynomial variable names are the same for K, N

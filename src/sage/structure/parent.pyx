@@ -1418,7 +1418,7 @@ cdef class Parent(sage.structure.category_object.CategoryObject):
               To:   Finite Field of size 5
 
         There might not be a natural morphism, in which case a
-        ``TypeError`` is raised::
+        :class:`TypeError` is raised::
 
             sage: QQ.hom(ZZ)
             Traceback (most recent call last):
@@ -2143,7 +2143,7 @@ cdef class Parent(sage.structure.category_object.CategoryObject):
 
             sage: # needs sage.combinat sage.modules
             sage: R = QQ['q,t'].fraction_field()
-            sage: Sym = sage.combinat.sf.sf.SymmetricFunctions(R)
+            sage: Sym = SymmetricFunctions(R)
             sage: H = Sym.macdonald().H()
             sage: P = Sym.macdonald().P()
             sage: m = Sym.monomial()
@@ -2180,7 +2180,7 @@ cdef class Parent(sage.structure.category_object.CategoryObject):
 
             sage: # needs sage.combinat sage.modules
             sage: R = QQ['q,t'].fraction_field()
-            sage: Sym = sage.combinat.sf.sf.SymmetricFunctions(R)
+            sage: Sym = SymmetricFunctions(R)
             sage: P = Sym.macdonald().P()
             sage: Ht = Sym.macdonald().Ht()
             sage: Ht._internal_coerce_map_from(P)

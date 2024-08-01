@@ -591,8 +591,9 @@ def UstimenkoGraph(const int m, const int q):
     Return the Ustimenko graph with parameters `(m, q)`.
 
     This is the distance 1 or 2 graph of the dual polar graph `C_{m-1}(q)`.
-    The graph is distance-regular with classical with parameters
-    `(d,q^2, qbinom(3,1,q) -1, qbinom(m+1,1,q) -1)`
+    The graph is distance-regular with parameters
+    `(d,q^2, \binom{3}{1}_q -1, \binom{m+1}{1}_q -1)`,
+    where `\binom{n}{k}_q` is the `q`-binomial coefficient.
 
     INPUT:
 
@@ -739,7 +740,7 @@ def AlternatingFormsGraph(const int n, const int q):
     matrices over `GF(q)` with zero diagonal. Two vertices are adjacent
     if and only if the difference of the two matrices has rank 2.
 
-    This grap is distance-regular with classical parameters
+    This graph is distance-regular with classical parameters
     `(\lfloor \frac n 2 \rfloor,  q^2, q^2 - 1, q^{2 \lceil \frac n 2 \rceil -1})`.
 
     INPUT:
@@ -833,7 +834,7 @@ def HermitianFormsGraph(const int n, const int r):
     r"""
     Return the Hermitian forms graph with the given parameters.
 
-    We build a graph whose vertices are all ``n``x``n`` Hermitian matrices
+    We build a graph whose vertices are all `n \times n` Hermitian matrices
     over ``GF(r^2)``. Two  vertices are adjacent if the difference of the two
     vertices has rank 1.
 
@@ -1128,7 +1129,7 @@ def DoubleGrassmannGraph(const int q, const int e):
     r"""
     Return the bipartite double of the distance-`e` graph of the Grassmann graph `J_q(n,e)`.
 
-    This graph can also be descirbed as follows:
+    This graph can also be described as follows:
     Let `V` be the vector space of dimension `n` over `GF(q)`.
     The vertex set is the set of `e+1` or `e` subspaces of `V`.
     Two vertices are adjacent if one subspace is contained in the other.

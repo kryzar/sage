@@ -42,7 +42,7 @@ from sage.categories.commutative_rings import CommutativeRings
 from sage.categories.rings import Rings
 
 import sage.rings.abc
-from sage.rings.integer_ring import is_IntegerRing
+from sage.rings.integer_ring import IntegerRing_class
 
 import sage.modules.free_module
 
@@ -1974,7 +1974,7 @@ cdef class Matrix(sage.structure.element.Matrix):
             sage: K = (A - e).kernel()
             sage: P = K.basis_matrix()
             sage: P.str()
-            '[             1.000000000000000? + 0.?e-17*I -2.116651487479748? + 0.0255565807096352?*I -0.2585224251020429? + 0.288602340904754?*I -0.4847545623533090? - 1.871890760086142?*I]'
+            '[              1.000000000000000? + 0.?e-17*I  -2.116651487479748? + 0.0255565807096352?*I -0.2585224251020429? + 0.2886023409047535?*I  -0.4847545623533090? - 1.871890760086142?*I]'
 
         Use single-row delimiters where appropriate::
 
@@ -5975,7 +5975,7 @@ cdef class Matrix(sage.structure.element.Matrix):
                 return (~self.lift_centered()).change_ring(R)
             except (TypeError, ZeroDivisionError):
                 raise ZeroDivisionError("input matrix must be nonsingular")
-        elif algorithm is None and is_IntegerRing(R):
+        elif algorithm is None and isinstance(R, IntegerRing_class):
             try:
                 return (~self).change_ring(R)
             except (TypeError, ZeroDivisionError):

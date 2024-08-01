@@ -139,10 +139,18 @@ def is_FreeModuleElement(x):
     EXAMPLES::
 
         sage: sage.modules.free_module_element.is_FreeModuleElement(0)
+        doctest:warning...
+        DeprecationWarning: The function is_FreeModuleElement is deprecated;
+        use 'isinstance(..., FreeModuleElement)' instead.
+        See https://github.com/sagemath/sage/issues/38184 for details.
         False
         sage: sage.modules.free_module_element.is_FreeModuleElement(vector([1,2,3]))
         True
     """
+    from sage.misc.superseded import deprecation_cython
+    deprecation_cython(38184,
+                       "The function is_FreeModuleElement is deprecated; "
+                       "use 'isinstance(..., FreeModuleElement)' instead.")
     return isinstance(x, FreeModuleElement)
 
 
@@ -547,7 +555,11 @@ def vector(arg0, arg1=None, arg2=None, sparse=None, immutable=False):
         R = None
 
     try:
+        import numpy
         from numpy import ndarray
+        if int(numpy.version.short_version[0]) > 1:
+            numpy.set_printoptions(legacy="1.25")
+
     except ImportError:
         pass
     else:
@@ -1180,7 +1192,11 @@ cdef class FreeModuleElement(Vector):   # abstract base class
             over Rational Field to numpy array of type <... 'float'>:
             setting an array element with a sequence.
         """
+        import numpy
         from numpy import array
+        if int(numpy.version.short_version[0]) > 1:
+            numpy.set_printoptions(legacy="1.25")
+
         try:
             return array(self, dtype=dtype)
         except ValueError as e:

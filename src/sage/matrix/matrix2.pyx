@@ -82,7 +82,6 @@ from cysignals.signals cimport sig_check
 
 from sage.categories.fields import Fields
 from sage.categories.integral_domains import IntegralDomains
-from sage.categories.principal_ideal_domains import PrincipalIdealDomains
 from sage.categories.rings import Rings
 from sage.misc.lazy_string import lazy_string
 from sage.misc.randstate cimport current_randstate
@@ -93,14 +92,14 @@ from sage.structure.element import Vector
 from sage.structure.element cimport have_same_parent
 from sage.misc.verbose import verbose
 from sage.rings.number_field.number_field_base import NumberField
-from sage.rings.integer_ring import ZZ, is_IntegerRing
-from sage.rings.rational_field import QQ, is_RationalField
+from sage.rings.integer_ring import ZZ, IntegerRing_class
+from sage.rings.rational_field import QQ, RationalField
 import sage.rings.abc
 from sage.arith.numerical_approx cimport digits_to_bits
 
 import sage.modules.free_module
 from sage.matrix import berlekamp_massey
-from sage.modules.free_module_element import is_FreeModuleElement
+from sage.modules.free_module_element import FreeModuleElement
 from sage.matrix.matrix_misc import permanental_minor_polynomial
 
 from sage.misc.misc_c import prod
@@ -221,8 +220,8 @@ cdef class Matrix(Matrix1):
             return matrix([a.subs(*args, **kwds) for a in self.list()],
                           nrows=self._nrows, ncols=self._ncols, sparse=False)
 
-    def solve_left(self, B, check=True):
-        """
+    def solve_left(self, B, check=True, *, extend=True):
+        r"""
         Try to find a solution `X` to the equation `X A = B`.
 
         If ``self`` is a matrix `A`, then this function returns a
@@ -235,15 +234,16 @@ cdef class Matrix(Matrix1):
         field, this method computes a least-squares solution if the
         system is not square.
 
-        .. NOTE::
-
-            In Sage one can also write ``B / A`` for
-            ``A.solve_left(B)``, that is, Sage implements "the
-            MATLAB/Octave slash operator".
-
         INPUT:
 
         - ``B`` -- a matrix or vector
+
+        - ``extend`` -- boolean (default: ``True``); when set to ``True``,
+          some solvers will return solutions over a larger ring than the
+          base ring of the inputs (a typical case are rational solutions
+          for integer linear systems). When set to ``False``, a solution
+          over the base ring is returned, with a :class:`ValueError`
+          being raised if none exists.
 
         - ``check`` -- boolean (default: ``True``); verify the answer
           if the system is non-square or rank-deficient, and if its
@@ -446,16 +446,16 @@ cdef class Matrix(Matrix1):
         """
         if isinstance(B, Vector):
             try:
-                return self.transpose().solve_right(B, check=check)
+                return self.transpose().solve_right(B, check=check, extend=extend)
             except ValueError as e:
                 raise e.__class__(str(e).replace('row', 'column'))
         else:
             try:
-                return self.transpose().solve_right(B.transpose(), check=check).transpose()
+                return self.transpose().solve_right(B.transpose(), check=check, extend=extend).transpose()
             except ValueError as e:
                 raise e.__class__(str(e).replace('row', 'column'))
 
-    def solve_right(self, B, check=True):
+    def solve_right(self, B, check=True, *, extend=True):
         r"""
         Try to find a solution `X` to the equation `A X = B`.
 
@@ -469,15 +469,16 @@ cdef class Matrix(Matrix1):
         field, this method computes a least-squares solution if the
         system is not square.
 
-        .. NOTE::
-
-            DEPRECATED. In Sage one can also write ``A \ B`` for
-            ``A.solve_right(B)``, that is, Sage implements "the
-            MATLAB/Octave backslash operator".
-
         INPUT:
 
         - ``B`` -- a matrix or vector
+
+        - ``extend`` -- boolean (default: ``True``); when set to ``True``,
+          some solvers will return solutions over a larger ring than the
+          base ring of the inputs (a typical case are rational solutions
+          for integer linear systems). When set to ``False``, a solution
+          over the base ring is returned, with a :class:`ValueError`
+          being raised if none exists.
 
         - ``check`` -- boolean (default: ``True``); verify the answer
           if the system is non-square or rank-deficient, and if its
@@ -897,7 +898,7 @@ cdef class Matrix(Matrix1):
         L = B.base_ring()
         # first coerce both elements to parent over same base ring
         P = K if L is K else coercion_model.common_parent(K, L)
-        if P not in _Fields and P.is_integral_domain():
+        if P not in _Fields and P.is_integral_domain() and extend:
             # the non-integral-domain case is handled separatedly below
             P = P.fraction_field()
         if L is not P:
@@ -944,6 +945,13 @@ cdef class Matrix(Matrix1):
 
         C = B.column() if b_is_vec else B
 
+        if not extend:
+            try:
+                X = self._solve_right_hermite_form(C)
+            except NotImplementedError:
+                X = self._solve_right_smith_form(C)
+            return X.column(0) if b_is_vec else X
+
         if not self.is_square():
             X = self._solve_right_general(C, check=check)
         else:
@@ -952,11 +960,7 @@ cdef class Matrix(Matrix1):
             except NotFullRankError:
                 X = self._solve_right_general(C, check=check)
 
-        if b_is_vec:
-            # Convert back to a vector
-            return X.column(0)
-        else:
-            return X
+        return X.column(0) if b_is_vec else X
 
     def _solve_right_nonsingular_square(self, B, check_rank=True):
         r"""
@@ -1070,6 +1074,138 @@ cdef class Matrix(Matrix1):
             if self*X != B:
                 raise ValueError("matrix equation has no solutions")
         return X
+
+    def _solve_right_smith_form(self, B):
+        r"""
+        Solve a matrix equation over a PID using the Smith normal form.
+
+        EXAMPLES::
+
+            sage: A = matrix(ZZ, 5, 7, [(1 + x^4) % 55 for x in range(5*7)]); A
+            [ 1  2 17 27 37 21 32]
+            [37 27 17 46 12  2 17]
+            [27 26 32 32 37 27  6]
+            [ 2 12  2 17 16 37 32]
+            [32 37 16 17  2 12  2]
+
+            sage: y = vector(ZZ, [1, 2, 3, 4, 5])
+            sage: x, = A._solve_right_smith_form(y.column()).columns()
+            sage: x.parent()
+            Ambient free module of rank 7 over the principal ideal domain Integer Ring
+            sage: A * x == y
+            True
+            sage: x
+            (10, 1530831087980480, -2969971929450215, -178745029498097, 2320752168397186, -806846536262381, -520939892126393)
+
+            sage: z = vector(ZZ, [-4, -1, 1, 5, 14, 31, 4])
+            sage: x, = A.transpose()._solve_right_smith_form(z.column()).columns()
+            sage: x.parent()
+            Ambient free module of rank 5 over the principal ideal domain Integer Ring
+            sage: x * A == z
+            True
+            sage: x
+            (-1, 0, 1, 1, -1)
+
+            sage: X = A._solve_right_smith_form(identity_matrix(ZZ,5))
+            sage: X.parent()
+            Full MatrixSpace of 7 by 5 dense matrices over Integer Ring
+            sage: X
+            [              -1                0                2                0                1]
+            [-156182670342972   -2199494166584  310625144000132          1293916  151907461896112]
+            [ 303010665531453    4267248023008 -602645168043247         -2510332 -294716315371323]
+            [  18236418267658     256820398262  -36269645268572          -151082  -17737230430447]
+            [-236774176922867   -3334450741532  470910201757143          1961587  230292926737068]
+            [  82318322106118    1159275026338 -163719448527234          -681977  -80065012022313]
+            [  53148766104440     748485096017 -105705345467375          -440318  -51693918051894]
+        """
+        S,U,V = self.smith_form()
+
+        n,m = self.dimensions()
+        r = B.ncols()
+
+        X_ = []
+        for d, v in zip(S.diagonal(), (U*B).rows()):
+            if d:
+                X_.append(v / d)
+            elif v:
+                raise ValueError("matrix equation has no solutions")
+            else:
+                X_.append([0] * r)
+
+        X_ += [[0] * r] * (m - n)  # arbitrary
+
+        from sage.matrix.constructor import matrix
+        try:
+            X_ = matrix(self.base_ring(), m, r, X_)
+        except TypeError:
+            raise ValueError("matrix equation has no solutions")
+
+        return V * X_
+
+    def _solve_right_hermite_form(self, B):
+        r"""
+        Solve a matrix equation over a PID using the Hermite normal form.
+
+        EXAMPLES::
+
+            sage: A = matrix(ZZ, 5, 7, [(1 + x^4) % 55 for x in range(5*7)]); A
+            [ 1  2 17 27 37 21 32]
+            [37 27 17 46 12  2 17]
+            [27 26 32 32 37 27  6]
+            [ 2 12  2 17 16 37 32]
+            [32 37 16 17  2 12  2]
+
+            sage: y = vector(ZZ, [1, 2, 3, 4, 5])
+            sage: x, = A._solve_right_hermite_form(y.column()).columns()
+            sage: x.parent()
+            Ambient free module of rank 7 over the principal ideal domain Integer Ring
+            sage: A * x == y
+            True
+            sage: x
+            (7903368738919, 1664769092987, -13561109876830, -5130794714802, 11219929764616, -2728570619520, 0)
+
+            sage: z = vector(ZZ, [-4, -1, 1, 5, 14, 31, 4])
+            sage: x, = A.transpose()._solve_right_hermite_form(z.column()).columns()
+            sage: x.parent()
+            Ambient free module of rank 5 over the principal ideal domain Integer Ring
+            sage: x * A == z
+            True
+            sage: x
+            (-1, 0, 1, 1, -1)
+
+            sage: X = A._solve_right_hermite_form(identity_matrix(ZZ,5))
+            sage: X.parent()
+            Full MatrixSpace of 7 by 5 dense matrices over Integer Ring
+            sage: X
+            [  682282983347  1029536563053   550188901703   877862915448       -1147487]
+            [  143716389918   216862037808   115892034032   184913433473        -241707]
+            [-1170705152437 -1766545243552  -944049606627 -1506293815517        1968932]
+            [ -442931873812  -668365722378  -357177603912  -569900577297         744938]
+            [  968595469303  1461570161933   781069571508  1246248350502       -1629017]
+            [ -235552378240  -355438713600  -189948023680  -303074680960         396160]
+            [             0              0              0              0              0]
+        """
+        H,U = self.transpose().hermite_form(transformation=True)
+        H = H.transpose()
+        U = U.transpose()
+#        assert self*U == H
+
+        n,m = self.dimensions()
+        r = B.ncols()
+
+        from sage.matrix.constructor import matrix
+        X_ = matrix(self.base_ring(), m, r)
+        for i in range(min(n,m)):
+            v = B[i,:]
+            v -= H[i,:i] * X_[:i]
+            d = H[i][i]
+            try:
+                X_[i] = v / d
+            except (ZeroDivisionError, TypeError) as e:
+                raise ValueError("matrix equation has no solution")
+#        assert H*X_ == B
+
+        return U * X_
 
     def prod_of_row_sums(self, cols):
         r"""
@@ -4538,11 +4674,11 @@ cdef class Matrix(Matrix1):
             algorithm = 'default'
         elif algorithm not in ['default', 'generic', 'flint', 'pari', 'padic', 'pluq']:
             raise ValueError("matrix kernel algorithm '%s' not recognized" % algorithm)
-        elif algorithm == 'padic' and not (is_IntegerRing(R) or is_RationalField(R)):
+        elif algorithm == 'padic' and not (isinstance(R, IntegerRing_class) or isinstance(R, RationalField)):
             raise ValueError("'padic' matrix kernel algorithm only available over the rationals and the integers, not over %s" % R)
-        elif algorithm == 'flint' and not (is_IntegerRing(R) or is_RationalField(R)):
+        elif algorithm == 'flint' and not (isinstance(R, IntegerRing_class) or isinstance(R, RationalField)):
             raise ValueError("'flint' matrix kernel algorithm only available over the rationals and the integers, not over %s" % R)
-        elif algorithm == 'pari' and not (is_IntegerRing(R) or (isinstance(R, NumberField) and not is_RationalField(R))):
+        elif algorithm == 'pari' and not (isinstance(R, IntegerRing_class) or (isinstance(R, NumberField) and not isinstance(R, RationalField))):
             raise ValueError("'pari' matrix kernel algorithm only available over non-trivial number fields and the integers, not over %s" % R)
         elif algorithm == 'generic' and R not in _Fields:
             raise ValueError("'generic' matrix kernel algorithm only available over a field, not over %s" % R)
@@ -4557,7 +4693,7 @@ cdef class Matrix(Matrix1):
             raise ValueError("matrix kernel basis format '%s' not recognized" % basis)
         elif basis == 'pivot' and R not in _Fields:
             raise ValueError('pivot basis only available over a field, not over %s' % R)
-        elif basis == 'LLL' and not is_IntegerRing(R):
+        elif basis == 'LLL' and not isinstance(R, IntegerRing_class):
             raise ValueError('LLL-reduced basis only available over the integers, not over %s' % R)
         if basis == 'default':
             basis = 'echelon' if R in _Fields else 'computed'
@@ -4566,7 +4702,7 @@ cdef class Matrix(Matrix1):
         proof = kwds.pop('proof', None)
         if proof not in [None, True, False]:
             raise ValueError("'proof' must be one of True, False or None, not %s" % proof)
-        if not (proof is None or is_IntegerRing(R)):
+        if not (proof is None or isinstance(R, IntegerRing_class)):
             raise ValueError("'proof' flag only valid for matrices over the integers")
 
         # We could sanitize/process remaining (un-popped) keywords here and
@@ -6017,7 +6153,7 @@ cdef class Matrix(Matrix1):
         """
         if v == 0:
             return []
-        if not is_FreeModuleElement(v):
+        if not isinstance(v, FreeModuleElement):
             raise TypeError("v must be a FreeModuleElement")
         VS = v.parent()
         V = VS.span([v])
@@ -10453,23 +10589,24 @@ cdef class Matrix(Matrix1):
             ....:                    [-1, 1, -6, -6, 5]])
             sage: Q, R = A.QR()
             sage: Q
-            [ -0.4588314677411235?  -0.1260506983326509?   0.3812120831224489?   -0.394573711338418?      -0.687440062597?]
-            [ -0.4588314677411235?   0.4726901187474409? -0.05198346588033394?    0.717294125164660?      -0.220962877263?]
-            [  0.2294157338705618?   0.6617661662464172?   0.6619227988762521?   -0.180872093737548?      0.1964114464561?]
-            [  0.6882472016116853?   0.1890760474989764?  -0.2044682991293135?    0.096630296654307?      -0.662888631790?]
+            [ -0.4588314677411235?  -0.1260506983326509?   0.3812120831224489?   -0.394573711338418?     -0.6874400625964?]
+            [ -0.4588314677411235?   0.4726901187474409? -0.05198346588033394?   0.7172941251646595?     -0.2209628772631?]
+            [  0.2294157338705618?   0.6617661662464172?   0.6619227988762521?  -0.1808720937375480?      0.1964114464561?]
+            [  0.6882472016116853?   0.1890760474989764?  -0.2044682991293135?   0.0966302966543065?     -0.6628886317894?]
             [ -0.2294157338705618?   0.5357154679137663?   -0.609939332995919?   -0.536422031427112?      0.0245514308070?]
             sage: R
             [  4.358898943540674? -0.4588314677411235?   13.07669683062202?   6.194224814505168?   2.982404540317303?]
             [                   0   1.670171752907625?  0.5987408170800917?  -1.292019657909672?   6.207996892883057?]
-            [                   0                    0   5.444401659866974?   5.468660610611130?  -0.682716185228386?]
-            [                   0                    0                    0   1.027626039419836?   -3.61930014968662?]
-            [                   0                    0                    0                    0    0.02455143080702?]
+            [                   0                    0   5.444401659866974?   5.468660610611130? -0.6827161852283857?]
+            [                   0                    0                    0   1.027626039419836?  -3.619300149686620?]
+            [                   0                    0                    0                    0   0.024551430807012?]
+
             sage: Q.conjugate_transpose()*Q
-            [1.000000000000000?            0.?e-18            0.?e-17            0.?e-15            0.?e-12]
-            [           0.?e-18 1.000000000000000?            0.?e-16            0.?e-15            0.?e-12]
-            [           0.?e-17            0.?e-16 1.000000000000000?            0.?e-15            0.?e-12]
-            [           0.?e-15            0.?e-15            0.?e-15 1.000000000000000?            0.?e-12]
-            [           0.?e-12            0.?e-12            0.?e-12            0.?e-12    1.000000000000?]
+            [1.000000000000000?            0.?e-18            0.?e-17            0.?e-16            0.?e-13]
+            [           0.?e-18 1.000000000000000?            0.?e-17            0.?e-16            0.?e-13]
+            [           0.?e-17            0.?e-17 1.000000000000000?            0.?e-16            0.?e-13]
+            [           0.?e-16            0.?e-16            0.?e-16 1.000000000000000?            0.?e-13]
+            [           0.?e-13            0.?e-13            0.?e-13            0.?e-13   1.0000000000000?]
             sage: Q * R == A
             True
 
@@ -10485,24 +10622,25 @@ cdef class Matrix(Matrix1):
             sage: Q, R = A.QR()
             sage: Q
             [                          -0.7302967433402215?    0.2070566455055649? + 0.5383472783144687?*I    0.2463049809998642? - 0.0764456358723292?*I    0.2381617683194332? - 0.1036596032779695?*I]
-            [                           0.0912870929175277?   -0.2070566455055649? - 0.3778783780476559?*I    0.3786559533863032? - 0.1952221495524667?*I      0.701244450214469? - 0.364371165098660?*I]
-            [   0.6390096504226938? + 0.0912870929175277?*I    0.1708217325420910? + 0.6677576817554466?*I -0.03411475806452072? + 0.04090198741767143?*I    0.3140171085506763? - 0.0825191718705412?*I]
+            [                           0.0912870929175277?   -0.2070566455055649? - 0.3778783780476559?*I    0.3786559533863033? - 0.1952221495524667?*I     0.701244450214469? - 0.3643711650986595?*I]
+            [   0.6390096504226938? + 0.0912870929175277?*I    0.1708217325420910? + 0.6677576817554466?*I -0.03411475806452072? + 0.04090198741767143?*I    0.3140171085506764? - 0.0825191718705412?*I]
             [   0.1825741858350554? + 0.0912870929175277?*I  -0.03623491296347385? + 0.0724698259269477?*I   0.8632284069415110? + 0.06322839976356195?*I   -0.4499694867611521? - 0.0116119181208918?*I]
             sage: R
             [                          10.95445115010333?               0.?e-18 - 1.917028951268082?*I    5.385938482134133? - 2.190890230020665?*I  -0.2738612787525831? - 2.190890230020665?*I]
-            [                                           0               4.829596256417300? + 0.?e-17*I   -0.869637911123373? - 5.864879483945125?*I   0.993871898426712? - 0.3054085521207082?*I]
+            [                                           0               4.829596256417300? + 0.?e-18*I   -0.869637911123373? - 5.864879483945125?*I   0.993871898426712? - 0.3054085521207082?*I]
             [                                           0                                            0               12.00160760935814? + 0.?e-16*I -0.2709533402297273? + 0.4420629644486323?*I]
             [                                           0                                            0                                            0               1.942963944258992? + 0.?e-16*I]
             sage: Q.conjugate_transpose()*Q
             [1.000000000000000? + 0.?e-19*I            0.?e-18 + 0.?e-17*I            0.?e-17 + 0.?e-17*I            0.?e-16 + 0.?e-16*I]
             [           0.?e-18 + 0.?e-17*I 1.000000000000000? + 0.?e-17*I            0.?e-17 + 0.?e-17*I            0.?e-16 + 0.?e-16*I]
-            [           0.?e-17 + 0.?e-17*I            0.?e-17 + 0.?e-17*I 1.000000000000000? + 0.?e-16*I            0.?e-16 + 0.?e-16*I]
-            [           0.?e-16 + 0.?e-16*I            0.?e-16 + 0.?e-16*I            0.?e-16 + 0.?e-16*I 1.000000000000000? + 0.?e-15*I]
+            [           0.?e-17 + 0.?e-17*I            0.?e-17 + 0.?e-17*I 1.000000000000000? + 0.?e-17*I            0.?e-16 + 0.?e-16*I]
+            [           0.?e-16 + 0.?e-16*I            0.?e-16 + 0.?e-16*I            0.?e-16 + 0.?e-16*I 1.000000000000000? + 0.?e-16*I]
+
             sage: Q*R - A
             [            0.?e-17 0.?e-17 + 0.?e-17*I 0.?e-16 + 0.?e-16*I 0.?e-16 + 0.?e-16*I]
-            [            0.?e-18 0.?e-17 + 0.?e-17*I 0.?e-16 + 0.?e-16*I 0.?e-15 + 0.?e-15*I]
+            [            0.?e-18 0.?e-17 + 0.?e-17*I 0.?e-16 + 0.?e-16*I 0.?e-16 + 0.?e-16*I]
             [0.?e-17 + 0.?e-18*I 0.?e-17 + 0.?e-17*I 0.?e-16 + 0.?e-16*I 0.?e-16 + 0.?e-16*I]
-            [0.?e-18 + 0.?e-18*I 0.?e-18 + 0.?e-17*I 0.?e-16 + 0.?e-16*I 0.?e-15 + 0.?e-16*I]
+            [0.?e-18 + 0.?e-18*I 0.?e-18 + 0.?e-18*I 0.?e-16 + 0.?e-16*I 0.?e-16 + 0.?e-16*I]
 
         A rank-deficient rectangular matrix, with both values of the ``full`` keyword.  ::
 
@@ -12192,9 +12330,9 @@ cdef class Matrix(Matrix1):
             sage: # needs sage.combinat sage.libs.pari
             sage: _, T = A.is_similar(B, transformation=True)
             sage: T
-            [ 1.0000000000000? + 0.?e-13*I           0.?e-13 + 0.?e-13*I           0.?e-13 + 0.?e-13*I]
-            [-0.6666666666667? + 0.?e-13*I 0.16666666666667? + 0.?e-14*I -0.8333333333334? + 0.?e-13*I]
-            [ 0.6666666666667? + 0.?e-13*I           0.?e-13 + 0.?e-13*I  -0.333333333334? + 0.?e-13*I]
+            [ 1.00000000000000? + 0.?e-14*I            0.?e-14 + 0.?e-14*I            0.?e-14 + 0.?e-14*I]
+            [-0.66666666666667? + 0.?e-15*I 0.166666666666667? + 0.?e-15*I -0.83333333333334? + 0.?e-14*I]
+            [ 0.66666666666667? + 0.?e-14*I            0.?e-14 + 0.?e-14*I -0.33333333333333? + 0.?e-14*I]
             sage: T.change_ring(QQ)
             [   1    0    0]
             [-2/3  1/6 -5/6]

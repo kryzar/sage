@@ -231,6 +231,8 @@ specified if given a non-interval and an interval::
 TESTS::
 
     sage: import numpy                                                                  # needs numpy
+    sage: if int(numpy.version.short_version[0]) > 1:                                   # needs numpy
+    ....:     numpy.set_printoptions(legacy="1.25")                                     # needs numpy
     sage: RIF(2) == numpy.int8('2')                                                     # needs numpy
     True
     sage: numpy.int8('2') == RIF(2)                                                     # needs numpy
@@ -5332,10 +5334,18 @@ def is_RealIntervalField(x):
     EXAMPLES::
 
         sage: sage.rings.real_mpfi.is_RealIntervalField(RIF)
+        doctest:warning...
+        DeprecationWarning: The function is_RealIntervalField is deprecated;
+        use 'isinstance(..., RealIntervalField_class)' instead.
+        See https://github.com/sagemath/sage/issues/38128 for details.
         True
         sage: sage.rings.real_mpfi.is_RealIntervalField(RealIntervalField(200))
         True
     """
+    from sage.misc.superseded import deprecation_cython
+    deprecation_cython(38128,
+                       "The function is_RealIntervalField is deprecated; "
+                       "use 'isinstance(..., RealIntervalField_class)' instead.")
     return isinstance(x, RealIntervalField_class)
 
 
@@ -5346,10 +5356,18 @@ def is_RealIntervalFieldElement(x):
     EXAMPLES::
 
         sage: sage.rings.real_mpfi.is_RealIntervalFieldElement(RIF(2.2))
+        doctest:warning...
+        DeprecationWarning: The function is_RealIntervalFieldElement is deprecated;
+        use 'isinstance(..., RealIntervalFieldElement)' instead.
+        See https://github.com/sagemath/sage/issues/38128 for details.
         True
         sage: sage.rings.real_mpfi.is_RealIntervalFieldElement(RealIntervalField(200)(2.2))
         True
     """
+    from sage.misc.superseded import deprecation_cython
+    deprecation_cython(38128,
+                       "The function is_RealIntervalFieldElement is deprecated; "
+                       "use 'isinstance(..., RealIntervalFieldElement)' instead.")
     return isinstance(x, RealIntervalFieldElement)
 
 

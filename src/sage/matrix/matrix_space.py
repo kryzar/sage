@@ -402,7 +402,7 @@ def get_matrix_class(R, nrows, ncols, sparse, implementation):
             if R.order() < matrix_modn_sparse.MAX_MODULUS:
                 return matrix_modn_sparse.Matrix_modn_sparse
 
-    if sage.rings.rational_field.is_RationalField(R):
+    if isinstance(R, sage.rings.rational_field.RationalField):
         try:
             from . import matrix_rational_sparse
         except ImportError:
@@ -410,7 +410,7 @@ def get_matrix_class(R, nrows, ncols, sparse, implementation):
         else:
             return matrix_rational_sparse.Matrix_rational_sparse
 
-    if sage.rings.integer_ring.is_IntegerRing(R):
+    if isinstance(R, sage.rings.integer_ring.IntegerRing_class):
         try:
             from . import matrix_integer_sparse
         except ImportError:
@@ -2170,9 +2170,20 @@ class MatrixSpace(UniqueRepresentation, Parent):
             False
             sage: MM.zero().is_mutable()
             False
+
+        Check that :issue:`38221` is fixed::
+
+            sage: # needs sage.groups
+            sage: G = CyclicPermutationGroup(7)
+            sage: R = GF(2)
+            sage: A = G.algebra(R)
+            sage: S = MatrixSpace(A, 3, 3)
+            sage: S.zero_matrix()
+            [0 0 0]
+            [0 0 0]
+            [0 0 0]
         """
-        zero = self.base_ring().zero()
-        res = self.element_class(self, zero, False, False)
+        res = self.element_class(self, None, False, False)
         res.set_immutable()
         return res
 

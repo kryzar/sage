@@ -25,10 +25,8 @@ AUTHORS:
 #                  https://www.gnu.org/licenses/
 # ****************************************************************************
 
-from sage.calculus.functions import jacobian
-from sage.functions.hyperbolic import cosh, sinh
-from sage.functions.log import exp
 from sage.matrix.constructor import matrix
+from sage.misc.lazy_import import lazy_import
 from sage.misc.misc_c import prod
 from sage.modules.free_module_element import vector
 from sage.rings.cc import CC
@@ -39,6 +37,10 @@ from sage.rings.laurent_series_ring import LaurentSeriesRing
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.rings.rational_field import QQ
 from sage.rings.real_mpfr import RealField
+
+lazy_import("sage.calculus.functions", "jacobian")
+lazy_import("sage.functions.hyperbolic", ["cosh", "sinh"])
+lazy_import("sage.functions.log", "exp")
 
 
 def covariant_z0(F, z0_cov=False, prec=53, emb=None, error_limit=0.000001):
@@ -77,8 +79,8 @@ def covariant_z0(F, z0_cov=False, prec=53, emb=None, error_limit=0.000001):
         sage: F = -x^8 + 6*x^7*y - 7*x^6*y^2 - 12*x^5*y^3 + 27*x^4*y^4\
         ....: - 4*x^3*y^5 - 19*x^2*y^6 + 10*x*y^7 - 5*y^8
         sage: covariant_z0(F, prec=80)
-        (0.64189877107807122203369 + 1.1852516565091601348355*I,
-         3134.5148284344627168275)
+        (0.64189877107807122203366 + 1.1852516565091601348355*I,
+        3134.5148284344627168276)
 
     ::
 

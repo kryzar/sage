@@ -81,6 +81,7 @@ __append_to_doc(
      "HouseXGraph",
      "LadderGraph",
      "LollipopGraph",
+     "MoebiusLadderGraph",
      "PathGraph",
      "StarGraph",
      "TadpoleGraph",
@@ -366,6 +367,7 @@ __append_to_doc(
      "RandomPartialKTree",
      "RandomLobster",
      "RandomNewmanWattsStrogatz",
+     "RandomProperIntervalGraph",
      "RandomRegular",
      "RandomShell",
      "RandomToleranceGraph",
@@ -454,6 +456,8 @@ AUTHORS:
   added (random, bounded) tolerance graphs
 
 - Marco Cognetta (2016-03-03): added TuranGraph
+
+- Janmenjaya Panda (2024-05-26): added MoebiusLadderGraph
 
 
 Functions and methods
@@ -2505,6 +2509,7 @@ class GraphGenerators:
     HouseGraph = staticmethod(basic.HouseGraph)
     HouseXGraph = staticmethod(basic.HouseXGraph)
     LadderGraph = staticmethod(basic.LadderGraph)
+    MoebiusLadderGraph = staticmethod(basic.MoebiusLadderGraph)
     PathGraph = staticmethod(basic.PathGraph)
     StarGraph = staticmethod(basic.StarGraph)
     Toroidal6RegularGrid2dGraph = staticmethod(basic.Toroidal6RegularGrid2dGraph)
@@ -2764,6 +2769,7 @@ class GraphGenerators:
     RandomIntervalGraph = staticmethod(random.RandomIntervalGraph)
     RandomLobster = staticmethod(random.RandomLobster)
     RandomNewmanWattsStrogatz = staticmethod(random.RandomNewmanWattsStrogatz)
+    RandomProperIntervalGraph = staticmethod(random.RandomProperIntervalGraph)
     RandomRegular = staticmethod(random.RandomRegular)
     RandomShell = staticmethod(random.RandomShell)
     RandomKTree = staticmethod(random.RandomKTree)
