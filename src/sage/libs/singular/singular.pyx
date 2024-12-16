@@ -1188,8 +1188,8 @@ cdef number *sa2si_transext_QQ(object elem, ring *_ring) noexcept:
     if nMapFuncPtr is NULL:
         raise RuntimeError("Failed to determine nMapFuncPtr")
 
-    numerdic = elem.numerator().dict()
-    denomdic = elem.denominator().dict()
+    numerdic = elem.numerator().monomial_coefficients()
+    denomdic = elem.denominator().monomial_coefficients()
 
     if numerdic and not isinstance(list(numerdic)[0], (tuple, ETuple)):
         numerdic = {(k,):b for k,b in numerdic.items()}
@@ -1303,8 +1303,8 @@ cdef number *sa2si_transext_FF(object elem, ring *_ring) noexcept:
     if nMapFuncPtr is NULL:
         raise RuntimeError("Failed to determine nMapFuncPtr")
 
-    numerdic = elem.numerator().dict()
-    denomdic = elem.denominator().dict()
+    numerdic = elem.numerator().monomial_coefficients()
+    denomdic = elem.denominator().monomial_coefficients()
 
     if numerdic and not isinstance(list(numerdic)[0], (tuple, ETuple)):
         numerdic = {(k,):b for k,b in numerdic.items()}
@@ -1535,7 +1535,7 @@ cdef inline number *sa2si_ZZmod(IntegerMod_abstract d, ring *_ring) noexcept:
     cdef nMapFunc nMapFuncPtr = NULL
 
     if _ring.cf.type == n_Z2m:
-        _d = long(d)
+        _d = d
         return nr2mMapZp(<number *>_d, currRing.cf, _ring.cf)
     elif _ring.cf.type == n_Zn or _ring.cf.type == n_Znm:
         lift = d.lift()
