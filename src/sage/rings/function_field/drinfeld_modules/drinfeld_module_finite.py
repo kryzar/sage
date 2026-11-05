@@ -18,6 +18,7 @@ AUTHORS:
 #                   http://www.gnu.org/licenses/
 # *****************************************************************************
 
+from sage.arith.misc import GCD
 from sage.functions.log import logb
 from sage.functions.other import ceil, sqrt
 from sage.matrix.constructor import Matrix
@@ -159,6 +160,40 @@ class DrinfeldModule_finite(DrinfeldModule):
         self._frobenius_norm = None
         self._frobenius_trace = None
         self._frobenius_charpoly = None
+
+    def annihilator(self, x, ideal=False):
+        """
+        TODO
+        """
+        # Check and sanitize the input:
+        K = self.base_over_constants_field()
+        try:
+            x = K(x)
+        except ValueError:
+            raise ValueError("input must be in the base field of the Drinfeld module")
+
+        A = self.function_ring()
+        # Trivial case:
+        if x == 0:
+            monic_gen = A.one()
+            return A.ideal(monic_gen) if ideal else monic_gen
+
+        # General case:
+        n = self._base_degree_over_constants  # Degree of K over Fq
+        phi_T = self.gen()
+        # Vector of n+1 elements [1, phi_T(x), ..., phi_T^n(x)]:
+        iterates = [x]
+        for i in range(1, n+1):
+            iterates.append(phi_T(iterates[i-1]))
+        # Get their coordinates, put them in a matrix.
+        # The kernel of the matrix is a space of annihilators of x
+        # (represented as vectors).
+        mat = Matrix([K(xi).vector() for xi in iterates])
+        annihilators = [A(list(vec)) for vec in mat.left_kernel().basis()]
+        # And return their gcd, which is the order of x:
+        monic_gen = GCD(annihilators)
+        return A.ideal(monic_gen) if ideal else monic_gen
+
 
     def _frobenius_matrix_crystalline(self):
         r"""
