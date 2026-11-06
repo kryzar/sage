@@ -194,7 +194,6 @@ class DrinfeldModule_finite(DrinfeldModule):
         monic_gen = GCD(annihilators)
         return A.ideal(monic_gen) if ideal else monic_gen
 
-
     def _frobenius_matrix_crystalline(self):
         r"""
         Return the matrix representing the Frobenius endomorphism on the
