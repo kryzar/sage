@@ -163,13 +163,76 @@ class DrinfeldModule_finite(DrinfeldModule):
 
     def annihilator(self, x, ideal=False):
         """
-        TODO
+        Return the annihilator of the input.
+
+        By definition, the *annihilator* of an rational point of the
+        Drinfeld module ``self`` (i.e. an element `x` in the base field
+        of ``self``) is the ideal of the function ring `\GF{q}[T]`
+        defined by
+
+        .. MATH::
+        \{ a \in \GF{q}[T] : \phi_a(x) = 0 \},
+
+        where `\phi` refers to the Drinfeld module ``self``.
+
+        This method returns the unique monic generator of this ideal, or
+        the ideal itself if `ideal` (default: ``False``) is set to
+        ``True``.
+
+        INPUT:
+
+        - ``x`` -- an element of the base field of the Drinfeld module
+
+        - ``ideal`` -- boolean (default: ``False``); if `True`` return
+          an ideal, otherwise, return its unique monic generator.
+
+        OUTPUT: an element or an ideal of the function ring
+
+        EXAMPLES::
+
+            - Start with the two examples from `frobenius_charpoly`: for
+              one you pick an element `x`, and for the other you have a
+              randomized test done by `x` being a random element in `K`.
+            - Showcase Lagrange's theorem (possibly right after the
+              first example): the annihilator of an element always
+              divides the "number of rational points of the Drinfeld module",
+              that is the Euler-Poincaré characteristic of the module of
+              rational points, which is equal to
+              `phi.frobenius_charpoly()(1)` (or the monic version of
+              that).
+            - Have indeed an example with `x` being zero.
+            - Add any other interesting mathematical phenomenon
+
+        ::
+
+            sage: Fq = GF(2)
+            sage: A.<T> = Fq[]
+            sage: K.<z> = Fq.extension(2)
+            sage: phi = DrinfeldModule(A, [z, 0, 1])
+            sage: phi.annihilator(z)
+            T^2 + T + 1
+            sage: phi.annihilator(z, ideal=True) == A.ideal(T^2 + T + 1)
+            True
+            sage: phi.annihilator(0)
+            1
+
+        TESTS:
+
+            - Show what happens if the input is NOT in the chosen base
+              field.
+            - Maybe a test to show minimality of the annihilator?
+            - Verify that all the annihilators of x are multiples of the
+              one we get as GCD.
+            - Test the case of a characteristic morphism equal to zero,
+              e.g. phi_T = tau.
+            - Test the case Fq = K.
+            - Test cases for the `try ... except`.
         """
         # Check and sanitize the input:
         K = self.base_over_constants_field()
         try:
             x = K(x)
-        except ValueError:
+        except:
             raise ValueError("input must be in the base field of the Drinfeld module")
 
         A = self.function_ring()
@@ -181,7 +244,7 @@ class DrinfeldModule_finite(DrinfeldModule):
         # General case:
         n = self._base_degree_over_constants  # Degree of K over Fq
         phi_T = self.gen()
-        # Vector of n+1 elements [1, phi_T(x), ..., phi_T^n(x)]:
+        # Vector of n+1 elements [x, phi_T(x), ..., phi_T^n(x)]:
         iterates = [x]
         for i in range(1, n+1):
             iterates.append(phi_T(iterates[i-1]))
