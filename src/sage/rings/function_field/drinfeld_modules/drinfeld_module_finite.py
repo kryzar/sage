@@ -176,7 +176,7 @@ class DrinfeldModule_finite(DrinfeldModule):
         where `\phi` refers to the Drinfeld module ``self``.
 
         This method returns the unique monic generator of this ideal, or
-        the ideal itself if `ideal` (default: ``False``) is set to
+        the ideal itself if ``ideal`` (default: ``False``) is set to
         ``True``.
 
         INPUT:
